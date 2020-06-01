@@ -1,45 +1,138 @@
-const { v4: uuid } = require('uuid')
-const { validationResult } = require('express-validator')
+const { validationResult } = require('../node_modules/express-validator/src')
+const jwt = require('../node_modules/jsonwebtoken')
+const bcrypt = require('bcrypt')
 
 const HttpError = require('../models/http-error')
+const User = require('../models/user')
 
-const DUMMY_USERS = [
-	{
-		username: 'name',
-		email: 'name@email.com',
-		password: 'password',
-		id: 'u1'
-	}
-]
-
-const signup = (req, res, next) => {
+const signup = async (req, res, next) => {
 	const errors = validationResult(req)
 	if (!errors.isEmpty()) {
-		console.log(errors)
-		throw new HttpError('Invalid inputs passed, please check your data.', 422)
+		return next(
+			new HttpError('Invalid inputs passed, please check your data.', 422)
+		)
 	}
 
 	const { username, email, password } = req.body
 
-	const userExists = DUMMY_USERS.find((u) => u.email === email)
-	if (userExists) {
-		throw new HttpError('Could not create user', 422)
+	let existingUser
+
+	try {
+		existingUser = await User.findOne({ email }) // does this also ensure collection is started in db?
+	} catch (err) {
+		const error = new HttpError('Signup failed, please try again', 500)
+		return next(error)
 	}
 
-	const newUser = { username, email, password, id: uuid() }
-	DUMMY_USERS.push(newUser)
-	res.status(201).json({ message: 'Signup successful', newUser })
+	if (existingUser) {
+		const error = new HttpError('Signup failed, please try again', 422)
+		return next(error)
+	}
+
+	let hashedPassword
+	try {
+		hashedPassword = await bcrypt.hash(password, 12)
+	} catch (err) {
+		const error = new HttpError('Could not create user, please try again.', 500)
+		return next(error)
+	}
+
+	const newUser = new User({
+		username,
+		email,
+		password: hashedPassword,
+		image: 'www.google.com', // change this later
+		recipes: []
+	})
+
+	try {
+		await newUser.save()
+	} catch (err) {
+		const error = new HttpError('Signup failed, please try again later.', 500)
+		return next(error)
+	}
+
+	let token
+	try {
+		token = jwt.sign(
+			{ userId: newUser.id, email: newUser.email },
+			process.env.JWT_KEY,
+			{
+				expiresIn: '12h'
+			}
+		)
+	} catch (err) {
+		const error = new HttpError('Signup failed, please try again later.', 500)
+		return next(error)
+	}
+
+	res.status(201).json({
+		message: 'Signup successful',
+		userId: newUser.id,
+		email: newUser.email,
+		token
+	})
 }
 
-const login = (req, res, next) => {
+const login = async (req, res, next) => {
 	const { email, password } = req.body
 
-	const userValid = DUMMY_USERS.find((u) => u.email === email)
-
-	if (!userValid || userValid.password !== password) {
-		throw new HttpError('Email or password incorrect', 401)
+	let existingUser
+	try {
+		existingUser = await User.findOne({ email })
+	} catch (err) {
+		const error = new HttpError(
+			'Login failed. This could be because you entered invalid credentials or you do not yet have an account.',
+			500
+		)
+		return next(error)
 	}
-	res.json({ message: 'Login successful!' })
+
+	if (!existingUser) {
+		const error = new HttpError(
+			'Login failed. This could be because you entered invalid credentials or you do not yet have an account.',
+			401
+		)
+		return next(error)
+	}
+
+	let isValidPassword = false
+
+	try {
+		isValidPassword = await bcrypt.compare(password, existingUser.password)
+	} catch (err) {
+		const error = new HttpError(
+			'Could not log you in, please check your credentials and try again.',
+			500
+		)
+		return next(error)
+	}
+
+	if (!isValidPassword) {
+		const error = new HttpError(
+			'Login failed. This could be because you entered invalid credentials or you do not yet have an account.',
+			401
+		)
+		return next(error)
+	}
+
+	let token
+	try {
+		token = jwt.sign(
+			{ userId: existingUser.id, email: existingUser.email },
+			process.env.JWT_KEY,
+			{ expiresIn: '12h' }
+		)
+	} catch (err) {
+		const error = new HttpError('Login failed, please try again later.', 500)
+		return next(error)
+	}
+
+	res.json({ message: 'Login successful!', id: existingUser.id, email, token })
 }
 
-module.exports = { signup, login }
+const logout = async (req, res, next) => {}
+
+const deleteAccount = async (req, res, next) => {}
+
+module.exports = { signup, login, logout, deleteAccount }

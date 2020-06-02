@@ -42,7 +42,7 @@ const signup = async (req, res, next) => {
 		email,
 		password: hashedPassword,
 		image: 'www.google.com', // change this later
-		recipes: []
+		recipesCreated: []
 	})
 
 	try {

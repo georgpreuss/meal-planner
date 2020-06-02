@@ -8,7 +8,8 @@ const userSchema = new Schema({
 	email: { type: String, required: true, unique: true },
 	password: { type: String, required: true, minLength: 6 },
 	image: { type: String, required: true },
-	recipes: [{ type: mongoose.Types.ObjectId, ref: 'Recipe' }] // rename recipesCreated?
+	// units: { type: String, required: true }, // e.g. metric or imperial
+	recipesCreated: [{ type: mongoose.Types.ObjectId, ref: 'Recipe' }] // rename recipesCreated?
 	// recipesCollection: [{type: String}] //
 })
 

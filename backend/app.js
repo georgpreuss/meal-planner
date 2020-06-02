@@ -4,6 +4,7 @@ const mongoose = require('mongoose')
 
 const usersRoutes = require('./routes/users-routes')
 const recipesRoutes = require('./routes/recipes-routes')
+const collectionsRoutes = require('./routes/collections-routes')
 const HttpError = require('./models/http-error')
 const { port, dbURI } = require('./config/environment')
 
@@ -13,6 +14,7 @@ app.use(bodyParser.json())
 
 app.use('/api/users', usersRoutes)
 app.use('/api/recipes', recipesRoutes)
+app.use('/api/collections', collectionsRoutes)
 
 app.use((req, res, next) => {
 	const error = new HttpError('Could not find this route', 404)

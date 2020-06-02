@@ -1,49 +1,43 @@
 const mongoose = require('mongoose')
 
-const Schema = mongoose.Schema
+// part peer review part personalisation
+const userSettings = new mongoose.Schema({
+	userId: { type: mongoose.Schema.ObjectId, ref: 'User' },
+	score: { type: Number, required: true }, // add validation, e.g. 1-5 which can be displayed as yummy emojis?
+	prepEffort: { type: Number, required: true }, // add validation, e.g. 1-4
+	cookEffort: { type: Number, required: true }, // add validation, e.g. 1-4
+	serves: { type: Number, required: true }, // add validation - integers only
+	images: [{ type: String }] // work out way to store user images
+})
 
-const recipeSchema = new Schema({
+const ingredient = new mongoose.Schema({
+	name: { type: String, required: true, unique: true }, // e.g. pepper
+	quantity: { type: Number }, // 1
+	weight: { type: Number } // use mongoose pre validation to ensure at least one out of quantity and weight is provided
+})
+
+const recipeSchema = new mongoose.Schema({
 	title: { type: String, required: true },
 	originalAuthor: { type: String }, // make sure to give credit to the author
-	rating: { type: Number, required: true }, // should it be required?
-	prepEffort: { type: Number, required: true }, // add validation e.g. 1-3 or 1-4
-	cookEffort: { type: Number, required: true }, // add validation here as well
-	serves: { type: Number, required: true }, // add validation - integers only
+	userSettings: [userSettings],
+	rating: { type: Number }, // empty at creation but then average of peer review scores
+	prepEffort: { type: Number, required: true }, // empty at creation but then average of userSettings
+	cookEffort: { type: Number, required: true }, // empty at creation but then average of userSettings
+	serves: { type: Number, required: true },
 	image: { type: String },
 	description: { type: String },
-	ingredients: { type: String, required: true }, // replace with subschema later
-	method: { type: String, required: true }, // replace with subschema later
-	tags: { type: String }, // think of something clever
+	ingredients: [ingredient],
+	units: { type: String, required: true }, // metric or imperial - don't forget validation!
+	method: [{ type: String, required: true }],
+	tags: { type: String }, // think of something clever - separate tags model to ensure unique tags?
 	comments: [{ type: String }], // link to different schema later
 	creatorName: { type: String, required: true },
-	creatorId: { type: mongoose.Types.ObjectId, required: true, ref: 'User' } // change to grab username later
-	// savedBy: [{ type: String }] // to capture how many people have it in their personal recipe collections - better in user schema as recipe array?
-	// forkedFrom: [{type: String, required: true}] // array where first entry corresponds to master's creatorID
-	// groupId: { type: mongoose.Types.ObjectId } // if common creation for e.g. event, flatshare
+	creatorId: { type: mongoose.Types.ObjectId, required: true, ref: 'User' }, // change to grab username later
+	version: { type: Number, required: true },
+	ancestors: [{ type: String }], // change to recipe ids
+	descendants: [{ type: String }], // change to recipe ids
+	downloadedByUser: [{ type: String }], // change to user ids
+	downloadedByGroup: [{ type: String }] // change to group ids
 })
 
 module.exports = mongoose.model('Recipe', recipeSchema)
-
-// example recipe format
-// {
-//   id: 'rec1',
-//   title: 'Carbonara',
-//   postedBy: 'me',
-//   source: 'The Silver Spoon',
-//   rating: 5,
-//   prepTime: 1,
-//   cookTime: 1,
-//   serves: 4,
-//   image: 'http://www.fillmurray.com/200/300',
-//   description: 'this is a simple but delicious pasta dish',
-//   ingredients: [
-//     { name: 'pasta', unit: 'grams', quantity: 500 },
-//     { name: 'parmesan', unit: 'grams', quantity: 100 }
-//   ],
-//   method: [
-//     { step: 1, description: 'Grate cheese' },
-//     { step: 2, description: 'fry bacon' }
-//   ],
-//   tags: ['pasta', 'italian'],
-//   comments: []
-// },

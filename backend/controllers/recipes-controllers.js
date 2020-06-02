@@ -24,6 +24,7 @@ const createRecipe = async (req, res, next) => {
 		description,
 		ingredients,
 		method,
+		units,
 		tags
 	} = req.body
 
@@ -51,11 +52,17 @@ const createRecipe = async (req, res, next) => {
 		image,
 		description,
 		ingredients,
+		units,
 		method,
 		tags,
 		comments: [],
 		creatorName: user.username,
-		creatorId: user._id
+		creatorId: user._id,
+		version: 1,
+		ancestors: [],
+		descendants: [],
+		downloadedByUser: [],
+		downloadedByGroup: []
 	})
 
 	try {
@@ -63,8 +70,7 @@ const createRecipe = async (req, res, next) => {
 		const session = await mongoose.startSession()
 		session.startTransaction()
 		await recipe.save({ session })
-		console.log('got to here')
-		user.recipes.push(recipe)
+		user.recipesCreated.push(recipe)
 		await user.save({ session })
 		await session.commitTransaction()
 	} catch (err) {
@@ -113,25 +119,6 @@ const getRecipeById = async (req, res, next) => {
 	res.status(200).json({ recipe })
 }
 
-const getRecipesCreatedByUserId = async (req, res, next) => {
-	const userId = req.params.userId
-
-	let recipes
-	try {
-		recipes = await Recipe.find({ creatorId: userId })
-	} catch (err) {
-		const error = new HttpError(
-			'Something went wrong, could not retrieve recipes for this user id.'
-		)
-		return next(error)
-	}
-	res.status(200).json({ recipes })
-}
-
-const getRecipesSavedByUserId = (req, res, next) => {
-	// get all recipes saved to a user's recipe collection
-}
-
 const editRecipe = (req, res, next) => {
 	// grab local copy
 }
@@ -142,12 +129,26 @@ const deleteRecipe = (req, res, next) => {
 	// or don't allow delete if recipe has been forked, rated, liked, etc.
 }
 
+const getRecipesByCreator = async (req, res, next) => {
+	const creatorId = req.params.creatorId
+
+	let recipes
+	try {
+		recipes = await Recipe.find({ creatorId })
+	} catch (err) {
+		const error = new HttpError(
+			'Something went wrong, could not retrieve recipes for this user id.'
+		)
+		return next(error)
+	}
+	res.status(200).json({ recipes })
+}
+
 module.exports = {
 	createRecipe,
 	getAllRecipes,
 	getRecipeById,
-	getRecipesCreatedByUserId,
-	getRecipesSavedByUserId,
 	editRecipe,
-	deleteRecipe
+	deleteRecipe,
+	getRecipesByCreator
 }

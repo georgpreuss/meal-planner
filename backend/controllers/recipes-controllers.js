@@ -54,24 +54,16 @@ const createRecipe = async (req, res, next) => {
 	res.status(201).json({ recipe })
 }
 
-const getAllRecipes = async (req, res, next) => {
-	let recipes
-	try {
-		recipes = await Recipe.find()
-	} catch (err) {
-		const error = new HttpError(
-			'Could not retrieve recipes, please try again later.',
-			500
-		)
-		return next(error)
-	}
-	if (!recipes) {
-		throw new HttpError(
-			'Currently there are no recipes, why not add one yourself?',
-			404
-		)
-	}
-	res.status(200).json({ recipes })
+const getAllRecipes = (req, res, next) => {
+	Recipe.find()
+		.then((recipe) => {
+			!recipe
+				? res
+						.status(404)
+						.json({ message: 'No recipes found, why not add one yourself?' })
+				: res.status(200).json(recipe)
+		})
+		.catch((err) => res.status(400).json({ error: err }))
 }
 
 const getRecipeById = async (req, res, next) => {

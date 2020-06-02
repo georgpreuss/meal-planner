@@ -16,6 +16,11 @@ router
 	.put(secureRoute, recipesControllers.editRecipe)
 	.delete(secureRoute, recipesControllers.deleteRecipe) // delete recipe - only from user's recipe book (so immediately make local copy of new recipes?)
 
+router.put(
+	'/settings/:recipeId',
+	secureRoute,
+	recipesControllers.editRecipeSettings
+)
 router.get('/creator/:creatorId', recipesControllers.getRecipesByCreator) // either individual or group collab
 
 module.exports = router

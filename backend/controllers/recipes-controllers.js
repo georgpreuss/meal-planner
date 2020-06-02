@@ -1,4 +1,3 @@
-const jwt = require('jsonwebtoken')
 const mongoose = require('mongoose')
 
 const HttpError = require('../models/http-error')
@@ -12,52 +11,25 @@ const createRecipe = async (req, res, next) => {
 	// 		new HttpError('Invalid inputs passed, please check your data.', 422)
 	// 	)
 	// }
+	const userId = req.currentUser._id
 
-	const {
-		title,
-		originalAuthor,
-		rating,
-		prepEffort,
-		cookEffort,
-		serves,
-		image,
-		description,
-		ingredients,
-		method,
-		units,
-		tags
-	} = req.body
-
-	// decode jwt and grab userId
 	let user
 	try {
-		const token = req.headers.authorization.split(' ')[1]
-		if (!token) {
-			throw new Error('Authentication failed!')
-		}
-		const decodedToken = jwt.verify(token, process.env.JWT_KEY)
-		user = await User.findById(decodedToken.userId)
+		user = await User.findById(userId)
 	} catch (err) {
 		const error = new HttpError('Authentication failed!', 401)
 		return next(error)
 	}
 
+	const { userSettings } = req.body
+
+	userSettings[0].userId = userId // bit of a hack?
+
 	const recipe = new Recipe({
-		title,
-		originalAuthor,
-		rating,
-		prepEffort,
-		cookEffort,
-		serves,
-		image,
-		description,
-		ingredients,
-		units,
-		method,
-		tags,
+		...req.body,
 		comments: [],
-		creatorName: user.username,
-		creatorId: user._id,
+		// creatorName: user.username, // remove or add logic to ensure this updates when username gets changed
+		creatorId: userId,
 		version: 1,
 		ancestors: [],
 		descendants: [],
@@ -66,11 +38,12 @@ const createRecipe = async (req, res, next) => {
 	})
 
 	try {
-		await recipe.save() // needed to create collection in db if collection doesn't exist yet
+		await recipe.save() // needed to create collection in db if collection doesn't exist yet?
 		const session = await mongoose.startSession()
 		session.startTransaction()
 		await recipe.save({ session })
 		user.recipesCreated.push(recipe)
+		user.recipeCollection.push(recipe)
 		await user.save({ session })
 		await session.commitTransaction()
 	} catch (err) {
@@ -78,7 +51,6 @@ const createRecipe = async (req, res, next) => {
 		return next(error)
 	}
 
-	// add code to immediately create local copy and save to personal recipe book?
 	res.status(201).json({ recipe })
 }
 
@@ -119,14 +91,38 @@ const getRecipeById = async (req, res, next) => {
 	res.status(200).json({ recipe })
 }
 
+const editRecipeSettings = async (req, res, next) => {
+	// console.log('req.body.user: ', req.body.user)
+	console.log('req.currentUser: ', req.currentUser)
+	const recipeId = req.params.recipeId
+	// TODO find userSettings that match userId
+	const { score, prepEffort, cookEffort, serves, images } = req.body
+
+	let recipe
+	try {
+		recipe = await Recipe.findById(recipeId, (err, recipe) => {
+			// console.log(recipe.userSettings.id('5ed66e18171102897e8a8963')) // this works
+			console.log(recipe.userSettings)
+		})
+		// console.log(recipe)
+		// recipe.userSettings.id({ userId: req.currentUser })
+	} catch (err) {
+		const error = new HttpError('Could not find recipe for this id', 500)
+		return next(error)
+	}
+
+	res.status(201).json({ message: 'edits made successfully', recipe })
+}
+
 const editRecipe = (req, res, next) => {
-	// grab local copy
+	// copy recipe document into new one which can be edited
+	// version plus 1
+	// add parentId into ancestors array of new document
+	// add childId into descendants array of parent document
 }
 
 const deleteRecipe = (req, res, next) => {
-	// delete only from personal recipe book
-	// remember master creator? will it be in forked recipes in the array anyway?
-	// or don't allow delete if recipe has been forked, rated, liked, etc.
+	// only allow delete if recipe.downloadedByUser is empty && recipe.descendants is empty
 }
 
 const getRecipesByCreator = async (req, res, next) => {
@@ -148,6 +144,7 @@ module.exports = {
 	createRecipe,
 	getAllRecipes,
 	getRecipeById,
+	editRecipeSettings,
 	editRecipe,
 	deleteRecipe,
 	getRecipesByCreator

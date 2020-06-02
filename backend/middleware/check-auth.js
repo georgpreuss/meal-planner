@@ -16,11 +16,11 @@ const secureRoute = (req, res, next) => {
 	}
 	jwt.verify(token, process.env.JWT_KEY, (err, payload) => {
 		// User.findById(payload.sub) // original from GA
-		User.findById(payload.userId)
+		User.findById(payload.userId, '_id') // '_id' to ensure no only that and no sensitive data is transmitted, otherwise '-password' to exclude password
 			.then((user) => {
-				console.log('user: ', user)
-				console.log('token: ', token)
-				console.log('payload.sub: ', payload.sub)
+				// console.log('user: ', user)
+				// console.log('token: ', token)
+				// console.log('payload.sub: ', payload.sub) // payload.sub undefined - investigate
 				if (!user) return res.status(401).json({ message: 'Unauthorized 3' })
 				req.currentUser = user
 				next()

@@ -4,6 +4,14 @@ const HttpError = require('../models/http-error')
 const Recipe = require('../models/recipe')
 const User = require('../models/user')
 
+// const createRecipeTest = (req, res, next) => {
+//   const userId = req.currentUser._id
+//   const { userSettings} = req.body
+//   userSettings[0].userId = userId
+//   User.findById(userId).then()
+
+// }
+
 const createRecipe = async (req, res, next) => {
 	// const errors = validationResult(req)
 	// if (!errors.isEmpty()) {
@@ -66,21 +74,10 @@ const getAllRecipes = (req, res, next) => {
 		.catch((err) => res.status(400).json({ error: err }))
 }
 
-const getRecipeById = async (req, res, next) => {
-	const recipeId = req.params.recipeId
-
-	let recipe
-	try {
-		recipe = await Recipe.findById(recipeId)
-	} catch (err) {
-		const error = new HttpError(
-			'Something went wrong, could not retrieve recipe for this id.',
-			500
-		)
-		return next(error)
-	}
-
-	res.status(200).json({ recipe })
+const getRecipeById = (req, res, next) => {
+	Recipe.findById(req.params.recipeId)
+		.then((recipe) => res.status(200).json(recipe))
+		.catch((err) => res.status(500).json({ error: err }))
 }
 
 const editRecipeSettings = async (req, res, next) => {

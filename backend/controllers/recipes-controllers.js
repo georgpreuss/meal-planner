@@ -114,19 +114,10 @@ const deleteRecipe = (req, res, next) => {
 	// only allow delete if recipe.downloadedByUser is empty && recipe.descendants is empty
 }
 
-const getRecipesByCreator = async (req, res, next) => {
-	const creatorId = req.params.creatorId
-
-	let recipes
-	try {
-		recipes = await Recipe.find({ creatorId })
-	} catch (err) {
-		const error = new HttpError(
-			'Something went wrong, could not retrieve recipes for this user id.'
-		)
-		return next(error)
-	}
-	res.status(200).json({ recipes })
+const getRecipesByCreator = (req, res, next) => {
+	Recipe.find({ creatorId: req.params.creatorId })
+		.then((recipes) => res.status(200).json(recipes))
+		.catch((err) => res.status(500).json({ error: err }))
 }
 
 module.exports = {

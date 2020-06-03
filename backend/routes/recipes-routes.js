@@ -13,7 +13,7 @@ router
 router
 	.route('/:recipeId')
 	.get(recipesControllers.getRecipeById)
-	.put(secureRoute, recipesControllers.editRecipe)
+	.put(secureRoute, recipesControllers.improveRecipe)
 	.delete(secureRoute, recipesControllers.deleteRecipe) // delete recipe - only from user's recipe book (so immediately make local copy of new recipes?)
 
 router.put(

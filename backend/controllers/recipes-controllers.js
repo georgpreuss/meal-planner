@@ -4,15 +4,7 @@ const HttpError = require('../models/http-error')
 const Recipe = require('../models/recipe')
 const User = require('../models/user')
 
-// const createRecipeTest = (req, res, next) => {
-//   const userId = req.currentUser._id
-//   const { userSettings} = req.body
-//   userSettings[0].userId = userId
-//   User.findById(userId).then()
-
-// }
-
-const createRecipe = async (req, res, next) => {
+const createRecipe = (req, res, next) => {
 	// const errors = validationResult(req)
 	// if (!errors.isEmpty()) {
 	// 	return next(
@@ -20,20 +12,9 @@ const createRecipe = async (req, res, next) => {
 	// 	)
 	// }
 	const userId = req.currentUser._id
-
-	let user
-	try {
-		user = await User.findById(userId)
-	} catch (err) {
-		const error = new HttpError('Authentication failed!', 401)
-		return next(error)
-	}
-
 	const { userSettings } = req.body
-
-	userSettings[0].userId = userId // bit of a hack?
-
-	const recipe = new Recipe({
+	userSettings[0].userId = userId
+	const newRecipe = new Recipe({
 		...req.body,
 		comments: [],
 		// creatorName: user.username, // remove or add logic to ensure this updates when username gets changed
@@ -44,22 +25,24 @@ const createRecipe = async (req, res, next) => {
 		downloadedByUser: [],
 		downloadedByGroup: []
 	})
-
-	try {
-		await recipe.save() // needed to create collection in db if collection doesn't exist yet?
-		const session = await mongoose.startSession()
-		session.startTransaction()
-		await recipe.save({ session })
-		user.recipesCreated.push(recipe)
-		user.recipeCollection.push(recipe)
-		await user.save({ session })
-		await session.commitTransaction()
-	} catch (err) {
-		const error = new HttpError('Could not save recipe, please try again.', 500)
-		return next(error)
-	}
-
-	res.status(201).json({ recipe })
+	let user
+	let session = null
+	User.findById(userId)
+		.then((userDocument) => {
+			user = userDocument
+		})
+		.then(() => mongoose.startSession())
+		.then((_session) => {
+			session = _session
+			session.startTransaction()
+			newRecipe.save({ session })
+			user.recipesCreated.push(newRecipe._id)
+			user.recipeCollection.push(newRecipe._id)
+			user.save({ session })
+		})
+		.then(() => session.commitTransaction())
+		.then(() => res.status(201).json({ newRecipe, user }))
+		.catch((err) => res.status(500).json({ error: err }))
 }
 
 const getAllRecipes = (req, res, next) => {
@@ -103,7 +86,7 @@ const editRecipeSettings = async (req, res, next) => {
 	res.status(201).json({ message: 'edits made successfully', recipe })
 }
 
-const editRecipe = (req, res, next) => {
+const improveRecipe = (req, res, next) => {
 	// copy recipe document into new one which can be edited
 	// version plus 1
 	// add parentId into ancestors array of new document
@@ -125,7 +108,7 @@ module.exports = {
 	getAllRecipes,
 	getRecipeById,
 	editRecipeSettings,
-	editRecipe,
+	improveRecipe,
 	deleteRecipe,
 	getRecipesByCreator
 }

@@ -8,11 +8,12 @@ const userSettings = new mongoose.Schema({
 	cookEffort: { type: Number, required: true }, // add validation, e.g. 1-4
 	serves: { type: Number, required: true }, // add validation - integers only
 	images: [{ type: String }] // work out way to store user images
+	// specialUtensils: [{ type: String }] // will impact effort levels
 })
 
 const ingredient = new mongoose.Schema({
 	// link to ingredientSchema where names are unique - users can add to that schema but when creating recipes ingredients will be taken from that collection
-	name: { type: String, required: true, unique: true }, // e.g. pepper
+	name: { type: String, required: true }, // e.g. pepper
 	quantity: { type: Number }, // 1
 	weight: { type: Number } // use mongoose pre validation to ensure at least one out of quantity and weight is provided
 })

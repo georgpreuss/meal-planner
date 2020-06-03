@@ -1,7 +1,8 @@
-const express = require('../node_modules/express')
-const { check } = require('../node_modules/express-validator/src')
+const express = require('express')
+const { check } = require('../../node_modules/express-validator/src')
 
 const usersControllers = require('../controllers/users-controllers')
+const secureRoute = require('../middleware/check-auth')
 
 const router = express.Router()
 
@@ -17,8 +18,12 @@ router.post(
 
 router.post('/login', usersControllers.login)
 
-router.post('/logout')
+router
+	.route('/:userId')
+	.get(usersControllers.getProfile)
+	.put(secureRoute, usersControllers.changeProfile)
+	.delete(secureRoute, usersControllers.deleteAccount)
 
-router.post('/deleteAccount') // delete account
+router.post('/forgotPassword', usersControllers.forgotPassword)
 
 module.exports = router

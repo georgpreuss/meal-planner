@@ -1,138 +1,132 @@
-const { validationResult } = require('../node_modules/express-validator/src')
-const jwt = require('../node_modules/jsonwebtoken')
-const bcrypt = require('bcrypt')
+// const { validationResult } = require('../node_modules/express-validator/src')
+const jwt = require('jsonwebtoken')
+const nodemailer = require('nodemailer')
 
-const HttpError = require('../models/http-error')
 const User = require('../models/user')
+const { port } = require('../config/environment')
 
-const signup = async (req, res, next) => {
-	const errors = validationResult(req)
-	if (!errors.isEmpty()) {
-		return next(
-			new HttpError('Invalid inputs passed, please check your data.', 422)
-		)
-	}
-
-	const { username, email, password } = req.body
-
-	let existingUser
-
-	try {
-		existingUser = await User.findOne({ email }) // does this also ensure collection is started in db?
-	} catch (err) {
-		const error = new HttpError('Signup failed, please try again', 500)
-		return next(error)
-	}
-
-	if (existingUser) {
-		const error = new HttpError('Signup failed, please try again', 422)
-		return next(error)
-	}
-
-	let hashedPassword
-	try {
-		hashedPassword = await bcrypt.hash(password, 12)
-	} catch (err) {
-		const error = new HttpError('Could not create user, please try again.', 500)
-		return next(error)
-	}
-
-	const newUser = new User({
-		username,
-		email,
-		password: hashedPassword,
-		image: 'www.google.com', // change this later
-		recipesCreated: []
-	})
-
-	try {
-		await newUser.save()
-	} catch (err) {
-		const error = new HttpError('Signup failed, please try again later.', 500)
-		return next(error)
-	}
-
-	let token
-	try {
-		token = jwt.sign(
-			{ userId: newUser.id, email: newUser.email },
-			process.env.JWT_KEY,
-			{
+const signup = (req, res, next) => {
+	User.create({
+		...req.body,
+		image: 'we',
+		units: 'metric',
+		resetPasswordToken: '',
+		resetPasswordExpires: null
+	}) // change later
+		.then((user) => {
+			const token = jwt.sign({ sub: user._id }, process.env.JWT_KEY, {
 				expiresIn: '12h'
-			}
-		)
-	} catch (err) {
-		const error = new HttpError('Signup failed, please try again later.', 500)
-		return next(error)
-	}
-
-	res.status(201).json({
-		message: 'Signup successful',
-		userId: newUser.id,
-		email: newUser.email,
-		token
-	})
+			})
+			res
+				.status(201)
+				.json({ message: 'Registration successful', id: user._id, token })
+		})
+		.catch(next)
 }
 
-const login = async (req, res, next) => {
+const login = (req, res, next) => {
 	const { email, password } = req.body
-
-	let existingUser
-	try {
-		existingUser = await User.findOne({ email })
-	} catch (err) {
-		const error = new HttpError(
-			'Login failed. This could be because you entered invalid credentials or you do not yet have an account.',
-			500
-		)
-		return next(error)
-	}
-
-	if (!existingUser) {
-		const error = new HttpError(
-			'Login failed. This could be because you entered invalid credentials or you do not yet have an account.',
-			401
-		)
-		return next(error)
-	}
-
-	let isValidPassword = false
-
-	try {
-		isValidPassword = await bcrypt.compare(password, existingUser.password)
-	} catch (err) {
-		const error = new HttpError(
-			'Could not log you in, please check your credentials and try again.',
-			500
-		)
-		return next(error)
-	}
-
-	if (!isValidPassword) {
-		const error = new HttpError(
-			'Login failed. This could be because you entered invalid credentials or you do not yet have an account.',
-			401
-		)
-		return next(error)
-	}
-
-	let token
-	try {
-		token = jwt.sign(
-			{ userId: existingUser.id, email: existingUser.email },
-			process.env.JWT_KEY,
-			{ expiresIn: '12h' }
-		)
-	} catch (err) {
-		const error = new HttpError('Login failed, please try again later.', 500)
-		return next(error)
-	}
-
-	res.json({ message: 'Login successful!', id: existingUser.id, email, token })
+	User.findOne({ email })
+		.then((user) => {
+			if (!user || !user.validatePassword(password)) {
+				return res.status(401).json({ message: 'Unauthorized 1' })
+			}
+			const token = jwt.sign({ sub: user._id }, process.env.JWT_KEY, {
+				expiresIn: '12h'
+			})
+			res.status(202).json({ id: user._id, token })
+		})
+		.catch(() => res.status(401).json({ message: 'Unauthorized 2' }))
 }
 
-const logout = async (req, res, next) => {}
+const getProfile = (req, res, next) => {
+	User.findById(req.params.userId, '-password') // how do you exclude multiple items - currently email is still included
+		.then((user) => res.status(200).json(user))
+		.catch((error) => res.status(500).json(error))
+}
 
-const deleteAccount = async (req, res, next) => {}
+const changeProfile = (req, res, next) => {
+	User.findById(req.params.userId)
+		.then((user) =>
+			!user
+				? res.status(404).json({ message: '404 not found' })
+				: user.set(req.body)
+		)
+		.then((user) => user.save())
+		.then((user) => res.status(202).json(user))
+		.catch((error) => res.status(500).json(error))
+}
 
-module.exports = { signup, login, logout, deleteAccount }
+// OPTIONAL
+const deleteAccount = (req, res, next) => {}
+
+// credit https://itnext.io/password-reset-emails-in-your-react-app-made-easy-with-nodemailer-bb27968310d7
+const forgotPassword = (req, res, next) => {
+	const { email } = req.body
+	!email
+		? res.status(400).json({ message: 'Email required' })
+		: User.findOne({ email }).then((user) => {
+				console.log(user)
+				if (!user) {
+					res.status(403).json({ message: 'This email is not in our database' })
+				} else {
+					// do I need to use crypto instead of jwt?
+					const token = jwt.sign({ sub: user._id }, process.env.JWT_KEY, {
+						expiresIn: '1h'
+					})
+					console.log('token: ', token)
+					user.update({
+						resetPasswordToken: token,
+						resetPasswordExpires: Date.now() + 3600000
+					})
+					const mailProvider = nodemailer.createTransport({
+						service: 'gmail',
+						auth: {
+							user: process.env.EMAIL_ADDRESS,
+							password: process.env.EMAIL_PASSWORD
+						}
+					})
+					const mailOptions = {
+						from: process.env.EMAIL_ADDRESS,
+						to: user.email,
+						subject: 'Link To Reset Password',
+						text: `
+            We heard that you lost your MEAL-PLANNER password. Sorry about that!
+
+            But don't worry! You can use the following link to reset your password:
+
+            http://localhost:${port}/api/users/reset${token}
+
+            If you did not request this, please ignore this email and your password will remain unchanged.
+            
+            This link will expire within 1 hour. To get a new password reset link, visit XXXXX
+
+            Thanks,
+            MEAL-PLANNER Team
+            `
+					}
+					console.log('sending email')
+
+					// console.log('mailProvider: ', mailProvider.options.auth)
+					// mailProvider.sendMail(mailOptions, (err, response) => {
+					// 	if (err) {
+					// 		console.log('An error has occured: ', err)
+					// 	} else {
+					// 		{
+					// 			console.log('Response: ', response)
+					// 		}
+					// 		res.status(200).json({ message: 'Password reset link sent' })
+					// 	}
+					// })
+				}
+		  })
+}
+
+module.exports = {
+	signup,
+	login,
+	getProfile,
+	changeProfile,
+	deleteAccount,
+	forgotPassword
+}

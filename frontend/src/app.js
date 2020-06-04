@@ -6,16 +6,19 @@ import 'bulma'
 import './style.scss'
 
 import SecureRoute from './lib/SecureRoute'
+import NavigationDrawer from './components/Navigation'
 import LandingPage from './components/LandingPage'
 import CreateRecipe from './components/CreateRecipe'
 
 const App = () => {
 	return (
 		<BrowserRouter>
-			<Switch>
-				<Route exact path="/" component={LandingPage} />
-				<SecureRoute exact path="/newRecipe" component={CreateRecipe} />
-			</Switch>
+			<NavigationDrawer>
+				<Switch>
+					<Route exact path="/" component={LandingPage} />
+					<SecureRoute exact path="/newRecipe" component={CreateRecipe} />
+				</Switch>
+			</NavigationDrawer>
 		</BrowserRouter>
 	)
 }

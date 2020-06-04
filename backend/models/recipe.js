@@ -27,6 +27,8 @@ const recipeSchema = new mongoose.Schema({
 	cookEffort: { type: Number, required: true }, // empty at creation but then average of userSettings
 	serves: { type: Number, required: true },
 	image: { type: String },
+	// cuisine: { type: String, required: true },
+	// diet: { type: String, required: true }, // to be worked out automatically based on ingredients
 	description: { type: String },
 	ingredients: [ingredient],
 	units: { type: String, required: true }, // metric or imperial - don't forget validation!

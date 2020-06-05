@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Avatar from '@material-ui/core/Avatar'
 import Button from '@material-ui/core/Button'
 import CssBaseline from '@material-ui/core/CssBaseline'
@@ -59,6 +59,7 @@ const Signup = ({ toggleForm }) => {
 	})
 
 	const handleChange = (e) => {
+		console.log('oi')
 		const data = { ...signup.data, [e.target.name]: e.target.value }
 		const errors = { ...signup.errors, [e.target.name]: '' }
 		setSignup({ data, errors })
@@ -72,7 +73,16 @@ const Signup = ({ toggleForm }) => {
 				toggleForm()
 			})
 			.catch((err) => {
-				setSignup({ ...signup, errors: err.response.data })
+				console.log('err: ', err.response.data)
+				setSignup({ ...signup, errors: err.response.data.errors })
+			})
+	}
+
+	const checkAvailable = () => {
+		axios
+			.post('/api/users/', { username: signup.data.username })
+			.then((res) => {
+				setSignup({ ...signup, errors: { username: res.data.message } })
 			})
 	}
 
@@ -86,10 +96,17 @@ const Signup = ({ toggleForm }) => {
 				<Typography component="h1" variant="h5">
 					Sign up
 				</Typography>
-				<form className={classes.form} noValidate onSubmit={handleSubmit}>
+				<form
+					className={classes.form}
+					noValidate
+					onSubmit={handleSubmit}
+					onChange={handleChange}
+				>
 					<Grid container spacing={2}>
 						<Grid item xs={12}>
 							<TextField
+								error={!!signup.errors.username}
+								helperText={signup.errors.username}
 								variant="outlined"
 								required
 								fullWidth
@@ -97,11 +114,17 @@ const Signup = ({ toggleForm }) => {
 								label="Username"
 								name="username"
 								autoComplete="name" // this is a guess - check it's valid
-								onChange={handleChange}
+								onBlur={checkAvailable}
 							/>
 						</Grid>
 						<Grid item xs={12}>
 							<TextField
+								error={!!signup.errors.email}
+								helperText={
+									!signup.errors.email
+										? ''
+										: 'Please provide a valid email address'
+								}
 								variant="outlined"
 								required
 								fullWidth
@@ -109,11 +132,11 @@ const Signup = ({ toggleForm }) => {
 								label="Email Address"
 								name="email"
 								autoComplete="email"
-								onChange={handleChange}
 							/>
 						</Grid>
 						<Grid item xs={12}>
 							<TextField
+								error={!!signup.errors.password}
 								variant="outlined"
 								required
 								fullWidth
@@ -122,11 +145,11 @@ const Signup = ({ toggleForm }) => {
 								type="password"
 								id="password"
 								// autoComplete="current-password"
-								onChange={handleChange}
 							/>
 						</Grid>
 						<Grid item xs={12}>
 							<TextField
+								error={!!signup.errors.passwordConfirmation}
 								variant="outlined"
 								required
 								fullWidth
@@ -135,7 +158,6 @@ const Signup = ({ toggleForm }) => {
 								type="password"
 								id="passwordConfirmation"
 								// autoComplete="current-password"
-								onChange={handleChange}
 							/>
 						</Grid>
 						<Grid item xs={12}></Grid>

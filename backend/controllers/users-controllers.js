@@ -5,6 +5,20 @@ const nodemailer = require('nodemailer')
 const User = require('../models/user')
 const { port } = require('../config/environment')
 
+const checkAvailable = (req, res, next) => {
+	const { username } = req.body
+	User.findOne({ username })
+		.then((user) => {
+			// console.log(!user)
+			if (user) {
+				return res
+					.status(201)
+					.json({ message: 'This username is unavailable, please try another' })
+			}
+		})
+		.catch((error) => res.status(500).json(error))
+}
+
 const signup = (req, res, next) => {
 	User.create({
 		...req.body,
@@ -21,7 +35,7 @@ const signup = (req, res, next) => {
 				.status(201)
 				.json({ message: 'Registration successful', id: user._id, token })
 		})
-		.catch(next)
+		.catch((error) => res.status(500).json(error))
 }
 
 const login = (req, res, next) => {
@@ -123,6 +137,7 @@ const forgotPassword = (req, res, next) => {
 }
 
 module.exports = {
+	checkAvailable,
 	signup,
 	login,
 	getProfile,

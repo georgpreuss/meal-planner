@@ -6,6 +6,8 @@ const secureRoute = require('../middleware/check-auth')
 
 const router = express.Router()
 
+router.post('/', usersControllers.checkAvailable)
+
 router.post(
 	'/signup',
 	[

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import { Link } from 'react-router-dom'
 import clsx from 'clsx'
 import { makeStyles, useTheme } from '@material-ui/core/styles'
@@ -19,7 +19,8 @@ import ListItemText from '@material-ui/core/ListItemText'
 import InboxIcon from '@material-ui/icons/MoveToInbox'
 import MailIcon from '@material-ui/icons/Mail'
 
-import LoginModal from './LoginModal'
+import { ModalContext } from './ModalContext'
+import SignupLoginModal from './SignupLoginModal'
 
 const drawerWidth = 240
 
@@ -84,14 +85,10 @@ const Navigation = ({ children }) => {
 	const classes = useStyles()
 	const theme = useTheme()
 	const [openDrawer, setOpenDrawer] = useState(true)
-	const [openLoginModal, setOpenLoginModal] = useState(false)
+	const { toggleModal } = useContext(ModalContext)
 
 	const toggleDrawer = () => {
 		setOpenDrawer(!openDrawer)
-	}
-
-	const toggleLoginModal = () => {
-		setOpenLoginModal(!openLoginModal)
 	}
 
 	return (
@@ -139,7 +136,8 @@ const Navigation = ({ children }) => {
 					</div>
 					<Divider />
 					<List>
-						<ListItem button onClick={toggleLoginModal}>
+						<ListItem button onClick={toggleModal}>
+							{/* <ListItem button> */}
 							<ListItemText>Signup / Login</ListItemText>
 						</ListItem>
 						{/* {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
@@ -175,7 +173,7 @@ const Navigation = ({ children }) => {
 					{children}
 				</main>
 			</div>
-			<LoginModal toggleModal={toggleLoginModal} isModalOpen={openLoginModal} />
+			<SignupLoginModal />
 		</>
 	)
 }

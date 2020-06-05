@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Avatar from '@material-ui/core/Avatar'
 import Button from '@material-ui/core/Button'
 import CssBaseline from '@material-ui/core/CssBaseline'
@@ -10,6 +10,7 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined'
 import Typography from '@material-ui/core/Typography'
 import { makeStyles } from '@material-ui/core/styles'
 import Container from '@material-ui/core/Container'
+import axios from 'axios'
 
 function Copyright() {
 	return (
@@ -47,6 +48,34 @@ const useStyles = makeStyles((theme) => ({
 const Signup = ({ toggleForm }) => {
 	const classes = useStyles()
 
+	const [signup, setSignup] = useState({
+		data: {
+			username: '',
+			email: '',
+			password: '',
+			passwordConfirmation: ''
+		},
+		errors: {}
+	})
+
+	const handleChange = (e) => {
+		const data = { ...signup.data, [e.target.name]: e.target.value }
+		const errors = { ...signup.errors, [e.target.name]: '' }
+		setSignup({ data, errors })
+	}
+
+	const handleSubmit = (e) => {
+		e.preventDefault()
+		axios
+			.post('/api/users/signup', signup.data)
+			.then(() => {
+				toggleForm()
+			})
+			.catch((err) => {
+				setSignup({ ...signup, errors: err.response.data })
+			})
+	}
+
 	return (
 		<Container component="main" maxWidth="xs">
 			<CssBaseline />
@@ -57,7 +86,7 @@ const Signup = ({ toggleForm }) => {
 				<Typography component="h1" variant="h5">
 					Sign up
 				</Typography>
-				<form className={classes.form} noValidate>
+				<form className={classes.form} noValidate onSubmit={handleSubmit}>
 					<Grid container spacing={2}>
 						<Grid item xs={12}>
 							<TextField
@@ -68,6 +97,7 @@ const Signup = ({ toggleForm }) => {
 								label="Username"
 								name="username"
 								autoComplete="name" // this is a guess - check it's valid
+								onChange={handleChange}
 							/>
 						</Grid>
 						<Grid item xs={12}>
@@ -79,6 +109,7 @@ const Signup = ({ toggleForm }) => {
 								label="Email Address"
 								name="email"
 								autoComplete="email"
+								onChange={handleChange}
 							/>
 						</Grid>
 						<Grid item xs={12}>
@@ -90,7 +121,21 @@ const Signup = ({ toggleForm }) => {
 								label="Password"
 								type="password"
 								id="password"
-								autoComplete="current-password"
+								// autoComplete="current-password"
+								onChange={handleChange}
+							/>
+						</Grid>
+						<Grid item xs={12}>
+							<TextField
+								variant="outlined"
+								required
+								fullWidth
+								name="passwordConfirmation"
+								label="Password Confirmation"
+								type="password"
+								id="passwordConfirmation"
+								// autoComplete="current-password"
+								onChange={handleChange}
 							/>
 						</Grid>
 						<Grid item xs={12}></Grid>

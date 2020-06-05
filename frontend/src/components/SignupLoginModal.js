@@ -1,11 +1,14 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import Dialog from '@material-ui/core/Dialog'
 
+import { ModalContext } from './ModalContext'
 import Login from './LoginForm'
 import Signup from './SignupForm'
 
-const LoginModal = ({ toggleModal, isModalOpen }) => {
+const SignupLoginModal = () => {
 	const [showLogin, setShowLogin] = useState(true)
+
+	const { showModal, toggleModal } = useContext(ModalContext)
 
 	const toggleForm = () => {
 		setShowLogin(!showLogin)
@@ -13,7 +16,7 @@ const LoginModal = ({ toggleModal, isModalOpen }) => {
 
 	return (
 		<Dialog
-			open={isModalOpen}
+			open={showModal}
 			onClose={toggleModal}
 			aria-labelledby="form-dialog-title"
 		>
@@ -26,4 +29,4 @@ const LoginModal = ({ toggleModal, isModalOpen }) => {
 	)
 }
 
-export default LoginModal
+export default SignupLoginModal

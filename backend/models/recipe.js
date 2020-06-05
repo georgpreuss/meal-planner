@@ -22,7 +22,7 @@ const recipeSchema = new mongoose.Schema({
 	title: { type: String, required: true },
 	originalAuthor: { type: String }, // make sure to give credit to the author
 	userSettings: [userSettings],
-	rating: { type: Number }, // empty at creation but then average of peer review scores
+	averageScore: { type: Number }, // empty at creation but then average of peer review scores
 	prepEffort: { type: Number, required: true }, // empty at creation but then average of userSettings
 	cookEffort: { type: Number, required: true }, // empty at creation but then average of userSettings
 	serves: { type: Number, required: true },
@@ -31,7 +31,7 @@ const recipeSchema = new mongoose.Schema({
 	// diet: { type: String, required: true }, // to be worked out automatically based on ingredients
 	description: { type: String },
 	ingredients: [ingredient],
-	units: { type: String, required: true }, // metric or imperial - don't forget validation!
+	recipeUnits: { type: String, required: true }, // metric or imperial - don't forget validation!
 	method: [{ type: String, required: true }],
 	tags: { type: String }, // think of something clever - separate tags model to ensure unique tags?
 	comments: [{ type: String }], // link to different schema later

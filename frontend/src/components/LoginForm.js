@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import Avatar from '@material-ui/core/Avatar'
 import Button from '@material-ui/core/Button'
 import CssBaseline from '@material-ui/core/CssBaseline'
@@ -12,6 +12,10 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined'
 import Typography from '@material-ui/core/Typography'
 import { makeStyles } from '@material-ui/core/styles'
 import Container from '@material-ui/core/Container'
+import axios from 'axios'
+
+import Auth from '../lib/Auth'
+import { ModalContext } from './ModalContext'
 
 function Copyright() {
 	return (
@@ -49,6 +53,37 @@ const useStyles = makeStyles((theme) => ({
 const SignIn = ({ toggleForm }) => {
 	const classes = useStyles()
 
+	const { toggleModal } = useContext(ModalContext)
+
+	const [login, setLogin] = useState({
+		data: {
+			email: '',
+			password: ''
+		},
+		errors: ''
+	})
+
+	const handleChange = (e) => {
+		const data = { ...login.data, [e.target.name]: e.target.value }
+		const errors = ''
+		setLogin({ data, errors })
+	}
+
+	const handleSubmit = (e) => {
+		console.log('handling submit')
+		e.preventDefault()
+		axios
+			.post('/api/users/login', login.data)
+			.then((resp) => {
+				Auth.setToken(resp.data.token)
+				// console.log('resp.data: ', resp.data)
+				toggleModal()
+			})
+			.catch(() => {
+				setLogin({ ...login, errors: 'Invalid credentials, please try again' }) // squashed the bug!
+			})
+	}
+
 	return (
 		<Container component="main" maxWidth="xs">
 			<CssBaseline />
@@ -59,8 +94,14 @@ const SignIn = ({ toggleForm }) => {
 				<Typography component="h1" variant="h5">
 					Sign in
 				</Typography>
-				<form className={classes.form} noValidate>
+				<form
+					className={classes.form}
+					noValidate
+					onChange={handleChange}
+					onSubmit={handleSubmit}
+				>
 					<TextField
+						error={!!login.errors}
 						variant="outlined"
 						margin="normal"
 						required
@@ -72,6 +113,12 @@ const SignIn = ({ toggleForm }) => {
 						autoFocus
 					/>
 					<TextField
+						error={!!login.errors}
+						helperText={
+							login.errors
+								? 'Invalid credentials or incorrect email and/or password'
+								: ''
+						}
 						variant="outlined"
 						margin="normal"
 						required

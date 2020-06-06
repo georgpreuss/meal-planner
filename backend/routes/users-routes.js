@@ -1,5 +1,5 @@
 const express = require('express')
-const { check } = require('../../node_modules/express-validator/src')
+const { check } = require('express-validator')
 
 const usersControllers = require('../controllers/users-controllers')
 const secureRoute = require('../middleware/check-auth')

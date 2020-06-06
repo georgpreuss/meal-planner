@@ -1,5 +1,5 @@
-import React, { useState, useContext } from 'react'
-import { Link } from 'react-router-dom'
+import React, { useState, useContext, useEffect } from 'react'
+import { Link, useHistory } from 'react-router-dom'
 import clsx from 'clsx'
 import { makeStyles, useTheme } from '@material-ui/core/styles'
 import Drawer from '@material-ui/core/Drawer'
@@ -21,6 +21,7 @@ import MailIcon from '@material-ui/icons/Mail'
 
 import { ModalContext } from './ModalContext'
 import SignupLoginModal from './SignupLoginModal'
+import Auth from '../lib/Auth'
 
 const drawerWidth = 240
 
@@ -84,11 +85,19 @@ const useStyles = makeStyles((theme) => ({
 const Navigation = ({ children }) => {
 	const classes = useStyles()
 	const theme = useTheme()
+	const history = useHistory()
 	const [openDrawer, setOpenDrawer] = useState(true)
 	const { toggleModal } = useContext(ModalContext)
+	const [loggedIn, setLoggedIn] = useState(true) // not using loggedIn at the moment...
 
 	const toggleDrawer = () => {
 		setOpenDrawer(!openDrawer)
+	}
+
+	const signout = () => {
+		Auth.logout()
+		setLoggedIn(false) // bit of a cheat to get 'Signup / Login' to reappear
+		history.push('/')
 	}
 
 	return (
@@ -96,6 +105,7 @@ const Navigation = ({ children }) => {
 			<div className={classes.root}>
 				<CssBaseline />
 				<AppBar
+					style={{ background: '#2E3B55' }}
 					position="fixed"
 					className={clsx(classes.appBar, {
 						[classes.appBarShift]: openDrawer
@@ -112,7 +122,7 @@ const Navigation = ({ children }) => {
 							<MenuIcon />
 						</IconButton>
 						<Typography variant="h6" noWrap>
-							This is not Gmail
+							MEAL-PLANNER
 						</Typography>
 					</Toolbar>
 				</AppBar>
@@ -136,21 +146,36 @@ const Navigation = ({ children }) => {
 					</div>
 					<Divider />
 					<List>
-						<ListItem button onClick={toggleModal}>
-							{/* <ListItem button> */}
-							<ListItemText>Signup / Login</ListItemText>
+						{/* {!Auth.isAuthorized() && (
+							<ListItem button onClick={toggleModal}>
+								<ListItemText>Signup / Login</ListItemText>
+							</ListItem>
+						)}
+						{Auth.isAuthorized() && (
+							<ListItem button onClick={signout}>
+								<ListItemText>Signout</ListItemText>
+							</ListItem>
+						)} */}
+						<ListItem
+							button
+							onClick={!Auth.isAuthorized() ? toggleModal : signout}
+						>
+							<ListItemText>
+								{!Auth.isAuthorized() ? 'Signup / Login' : 'Signout'}
+							</ListItemText>
 						</ListItem>
-						{/* {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-            <ListItem button key={text}>
-            <ListItemIcon>
-            {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-            </ListItemIcon>
-            <ListItemText primary={text} />
-						</ListItem>
-					))} */}
 					</List>
 					<Divider />
 					<List>
+						<ListItem button component={Link} to="/">
+							<ListItemText>Browse recipes</ListItemText>
+						</ListItem>
+						<ListItem>
+							<ListItemText>Recipe collection</ListItemText>
+						</ListItem>
+						<ListItem>
+							<ListItemText>My creations</ListItemText>
+						</ListItem>
 						{['All mail', 'Trash', 'Spam'].map((text, index) => (
 							<ListItem button key={text}>
 								<ListItemIcon>

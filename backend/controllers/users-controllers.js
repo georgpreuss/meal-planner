@@ -1,4 +1,4 @@
-// const { validationResult } = require('../node_modules/express-validator/src')
+// const { validationResult } = require('express-validator')
 const jwt = require('jsonwebtoken')
 const nodemailer = require('nodemailer')
 
@@ -20,6 +20,11 @@ const checkAvailable = (req, res, next) => {
 }
 
 const signup = (req, res, next) => {
+	// const errors = validationResult(req)
+	// if (!errors.isEmpty()) {
+	// 	console.log('errors: ', errors.errors)
+	// 	return res.status(500).json(errors)
+	// }
 	User.create({
 		...req.body,
 		image: 'we',

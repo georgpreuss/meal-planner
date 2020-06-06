@@ -1,88 +1,43 @@
 import React from 'react'
+import { makeStyles } from '@material-ui/core/styles'
+import Paper from '@material-ui/core/Paper'
+import Grid from '@material-ui/core/Grid'
 
-const LandingPage = () => {
+import RecipeCard from './RecipeCard'
+
+const useStyles = makeStyles((theme) => ({
+	root: {
+		flexGrow: 1
+	},
+	paper: {
+		padding: theme.spacing(2),
+		textAlign: 'center',
+		color: theme.palette.text.secondary
+	}
+}))
+
+export default function AutoGrid() {
+	const classes = useStyles()
+
 	return (
-		<h1>
-			Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet nostrum
-			provident incidunt maxime quisquam, aut velit magnam fugiat eius, officia
-			facilis laudantium expedita impedit quam iusto ducimus minus, vitae earum.
-			Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet nostrum
-			provident incidunt maxime quisquam, aut velit magnam fugiat eius, officia
-			facilis laudantium expedita impedit quam iusto ducimus minus, vitae earum.
-			Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet nostrum
-			provident incidunt maxime quisquam, aut velit magnam fugiat eius, officia
-			facilis laudantium expedita impedit quam iusto ducimus minus, vitae earum.
-			Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet nostrum
-			provident incidunt maxime quisquam, aut velit magnam fugiat eius, officia
-			facilis laudantium expedita impedit quam iusto ducimus minus, vitae earum.
-			Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet nostrum
-			provident incidunt maxime quisquam, aut velit magnam fugiat eius, officia
-			facilis laudantium expedita impedit quam iusto ducimus minus, vitae earum.
-			Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet nostrum
-			provident incidunt maxime quisquam, aut velit magnam fugiat eius, officia
-			facilis laudantium expedita impedit quam iusto ducimus minus, vitae earum.
-			Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet nostrum
-			provident incidunt maxime quisquam, aut velit magnam fugiat eius, officia
-			facilis laudantium expedita impedit quam iusto ducimus minus, vitae earum.
-			Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet nostrum
-			provident incidunt maxime quisquam, aut velit magnam fugiat eius, officia
-			facilis laudantium expedita impedit quam iusto ducimus minus, vitae earum.
-			Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet nostrum
-			provident incidunt maxime quisquam, aut velit magnam fugiat eius, officia
-			facilis laudantium expedita impedit quam iusto ducimus minus, vitae earum.
-			Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet nostrum
-			provident incidunt maxime quisquam, aut velit magnam fugiat eius, officia
-			facilis laudantium expedita impedit quam iusto ducimus minus, vitae earum.
-			Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet nostrum
-			provident incidunt maxime quisquam, aut velit magnam fugiat eius, officia
-			facilis laudantium expedita impedit quam iusto ducimus minus, vitae earum.
-			Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet nostrum
-			provident incidunt maxime quisquam, aut velit magnam fugiat eius, officia
-			facilis laudantium expedita impedit quam iusto ducimus minus, vitae earum.
-			Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet nostrum
-			provident incidunt maxime quisquam, aut velit magnam fugiat eius, officia
-			facilis laudantium expedita impedit quam iusto ducimus minus, vitae earum.
-			Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet nostrum
-			provident incidunt maxime quisquam, aut velit magnam fugiat eius, officia
-			facilis laudantium expedita impedit quam iusto ducimus minus, vitae earum.
-			Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet nostrum
-			provident incidunt maxime quisquam, aut velit magnam fugiat eius, officia
-			facilis laudantium expedita impedit quam iusto ducimus minus, vitae earum.
-			Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet nostrum
-			provident incidunt maxime quisquam, aut velit magnam fugiat eius, officia
-			facilis laudantium expedita impedit quam iusto ducimus minus, vitae earum.
-			Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet nostrum
-			provident incidunt maxime quisquam, aut velit magnam fugiat eius, officia
-			facilis laudantium expedita impedit quam iusto ducimus minus, vitae earum.
-			Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet nostrum
-			provident incidunt maxime quisquam, aut velit magnam fugiat eius, officia
-			facilis laudantium expedita impedit quam iusto ducimus minus, vitae earum.
-			Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet nostrum
-			provident incidunt maxime quisquam, aut velit magnam fugiat eius, officia
-			facilis laudantium expedita impedit quam iusto ducimus minus, vitae earum.
-			Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet nostrum
-			provident incidunt maxime quisquam, aut velit magnam fugiat eius, officia
-			facilis laudantium expedita impedit quam iusto ducimus minus, vitae earum.
-			Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet nostrum
-			provident incidunt maxime quisquam, aut velit magnam fugiat eius, officia
-			facilis laudantium expedita impedit quam iusto ducimus minus, vitae earum.
-			Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet nostrum
-			provident incidunt maxime quisquam, aut velit magnam fugiat eius, officia
-			facilis laudantium expedita impedit quam iusto ducimus minus, vitae earum.
-			Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet nostrum
-			provident incidunt maxime quisquam, aut velit magnam fugiat eius, officia
-			facilis laudantium expedita impedit quam iusto ducimus minus, vitae earum.
-			Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet nostrum
-			provident incidunt maxime quisquam, aut velit magnam fugiat eius, officia
-			facilis laudantium expedita impedit quam iusto ducimus minus, vitae earum.
-			Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet nostrum
-			provident incidunt maxime quisquam, aut velit magnam fugiat eius, officia
-			facilis laudantium expedita impedit quam iusto ducimus minus, vitae earum.
-			Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet nostrum
-			provident incidunt maxime quisquam, aut velit magnam fugiat eius, officia
-			facilis laudantium expedita impedit quam iusto ducimus minus, vitae earum.
-		</h1>
+		<div className={classes.root}>
+			<Grid container spacing={3}>
+				<Grid item xs={6} sm={3}>
+					<RecipeCard />
+				</Grid>
+				<Grid item xs={6} sm={3}>
+					<RecipeCard />
+				</Grid>
+				<Grid item xs={6} sm={3}>
+					<RecipeCard />
+				</Grid>
+				<Grid item xs={6} sm={3}>
+					<RecipeCard />
+				</Grid>
+				<Grid item xs={6} sm={3}>
+					<RecipeCard />
+				</Grid>
+			</Grid>
+		</div>
 	)
 }
-
-export default LandingPage

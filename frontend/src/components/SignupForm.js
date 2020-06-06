@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useContext } from 'react'
 import Avatar from '@material-ui/core/Avatar'
 import Button from '@material-ui/core/Button'
 import CssBaseline from '@material-ui/core/CssBaseline'
@@ -11,6 +11,8 @@ import Typography from '@material-ui/core/Typography'
 import { makeStyles } from '@material-ui/core/styles'
 import Container from '@material-ui/core/Container'
 import axios from 'axios'
+
+import { ModalContext } from './ModalContext'
 
 function Copyright() {
 	return (
@@ -48,6 +50,8 @@ const useStyles = makeStyles((theme) => ({
 const Signup = ({ toggleForm }) => {
 	const classes = useStyles()
 
+	const { toggleModal } = useContext(ModalContext)
+
 	const [signup, setSignup] = useState({
 		data: {
 			username: '',
@@ -59,7 +63,6 @@ const Signup = ({ toggleForm }) => {
 	})
 
 	const handleChange = (e) => {
-		console.log('oi')
 		const data = { ...signup.data, [e.target.name]: e.target.value }
 		const errors = { ...signup.errors, [e.target.name]: '' }
 		setSignup({ data, errors })
@@ -70,10 +73,10 @@ const Signup = ({ toggleForm }) => {
 		axios
 			.post('/api/users/signup', signup.data)
 			.then(() => {
-				toggleForm()
+				toggleModal()
 			})
 			.catch((err) => {
-				console.log('err: ', err.response.data)
+				console.log('err: ', err.response.data.errors)
 				setSignup({ ...signup, errors: err.response.data.errors })
 			})
 	}
@@ -83,6 +86,7 @@ const Signup = ({ toggleForm }) => {
 			.post('/api/users/', { username: signup.data.username })
 			.then((res) => {
 				setSignup({ ...signup, errors: { username: res.data.message } })
+				console.log(signup)
 			})
 	}
 
@@ -106,7 +110,9 @@ const Signup = ({ toggleForm }) => {
 						<Grid item xs={12}>
 							<TextField
 								error={!!signup.errors.username}
-								helperText={signup.errors.username}
+								helperText={
+									signup.errors.username ? 'This username is unavailable' : ''
+								}
 								variant="outlined"
 								required
 								fullWidth
@@ -121,9 +127,7 @@ const Signup = ({ toggleForm }) => {
 							<TextField
 								error={!!signup.errors.email}
 								helperText={
-									!signup.errors.email
-										? ''
-										: 'Please provide a valid email address'
+									signup.errors.email ? 'Please provide an email address' : ''
 								}
 								variant="outlined"
 								required
@@ -137,6 +141,9 @@ const Signup = ({ toggleForm }) => {
 						<Grid item xs={12}>
 							<TextField
 								error={!!signup.errors.password}
+								helperText={
+									signup.errors.password ? 'Please provide a password' : ''
+								}
 								variant="outlined"
 								required
 								fullWidth
@@ -150,6 +157,11 @@ const Signup = ({ toggleForm }) => {
 						<Grid item xs={12}>
 							<TextField
 								error={!!signup.errors.passwordConfirmation}
+								helperText={
+									signup.errors.passwordConfirmation
+										? 'Password does not match'
+										: ''
+								}
 								variant="outlined"
 								required
 								fullWidth

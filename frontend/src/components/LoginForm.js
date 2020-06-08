@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useState, useContext } from 'react'
 import Avatar from '@material-ui/core/Avatar'
 import Button from '@material-ui/core/Button'
 import CssBaseline from '@material-ui/core/CssBaseline'
@@ -53,7 +53,7 @@ const useStyles = makeStyles((theme) => ({
 const SignIn = ({ toggleForm }) => {
 	const classes = useStyles()
 
-	const { toggleModal } = useContext(ModalContext)
+	const { toggleModal, loggedIn, setLoggedIn } = useContext(ModalContext)
 
 	const [login, setLogin] = useState({
 		data: {
@@ -78,6 +78,7 @@ const SignIn = ({ toggleForm }) => {
 				Auth.setToken(resp.data.token)
 				// console.log('resp.data: ', resp.data)
 				toggleModal()
+				setLoggedIn(!loggedIn)
 			})
 			.catch(() => {
 				setLogin({ ...login, errors: 'Invalid credentials, please try again' }) // squashed the bug!

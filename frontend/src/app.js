@@ -1,38 +1,33 @@
-import React, { useState, useMemo } from 'react'
+import React from 'react'
 import ReactDOM from 'react-dom'
 import { BrowserRouter, Switch, Route } from 'react-router-dom'
 
 import 'bulma'
 import './style.scss'
 
-import { ModalContext } from './components/ModalContext'
+import GlobalState from './context/GlobalState'
 import SecureRoute from './lib/SecureRoute'
-import NavigationDrawer from './components/Navigation'
+import Navigation from './components/Navigation'
 import LandingPage from './components/LandingPage'
-import CreateRecipe from './components/CreateRecipe'
+import RecipeCollections from './components/RecipeCollections'
+import AccountSettings from './components/AccountSettings'
 
 const App = () => {
-	const [showModal, setShowModal] = useState(false)
-
-	const toggleModal = () => {
-		setShowModal(!showModal)
-	}
-
-	const providerValue = useMemo(() => ({ showModal, toggleModal }), [
-		showModal,
-		setShowModal
-	])
-
 	return (
 		<BrowserRouter>
-			<ModalContext.Provider value={providerValue}>
-				<NavigationDrawer>
+			<GlobalState>
+				<Navigation>
 					<Switch>
 						<Route exact path="/" component={LandingPage} />
-						<SecureRoute exact path="/newRecipe" component={CreateRecipe} />
+						<SecureRoute exact path="/account" component={AccountSettings} />
+						<SecureRoute
+							exact
+							path="/collections"
+							component={RecipeCollections}
+						/>
 					</Switch>
-				</NavigationDrawer>
-			</ModalContext.Provider>
+				</Navigation>
+			</GlobalState>
 		</BrowserRouter>
 	)
 }

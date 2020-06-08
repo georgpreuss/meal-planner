@@ -1,40 +1,29 @@
-import React, { useState, useContext, useEffect } from 'react'
+import React, { useState, useContext } from 'react'
 import { Link, useHistory } from 'react-router-dom'
 import clsx from 'clsx'
 import { fade, makeStyles, useTheme } from '@material-ui/core/styles'
 import Drawer from '@material-ui/core/Drawer'
 import CssBaseline from '@material-ui/core/CssBaseline'
-import AppBar from '@material-ui/core/AppBar'
-import Toolbar from '@material-ui/core/Toolbar'
 import List from '@material-ui/core/List'
-import Typography from '@material-ui/core/Typography'
 import Divider from '@material-ui/core/Divider'
 import IconButton from '@material-ui/core/IconButton'
-import MenuIcon from '@material-ui/icons/Menu'
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
 import ChevronRightIcon from '@material-ui/icons/ChevronRight'
 import ListItem from '@material-ui/core/ListItem'
 import ListItemIcon from '@material-ui/core/ListItemIcon'
 import ListItemText from '@material-ui/core/ListItemText'
-import InputBase from '@material-ui/core/InputBase'
 import LibraryBooksIcon from '@material-ui/icons/LibraryBooks'
 import LocalLibraryIcon from '@material-ui/icons/LocalLibrary'
-import AccountBoxIcon from '@material-ui/icons/AccountBox'
 import LibraryAddIcon from '@material-ui/icons/LibraryAdd'
 import LocalGroceryStoreIcon from '@material-ui/icons/LocalGroceryStore'
-import SearchIcon from '@material-ui/icons/Search'
 import ExitToAppIcon from '@material-ui/icons/ExitToApp'
-import Badge from '@material-ui/core/Badge'
-import MailIcon from '@material-ui/icons/Mail'
-import NotificationsIcon from '@material-ui/icons/Notifications'
-import AccountCircle from '@material-ui/icons/AccountCircle'
-import MenuItem from '@material-ui/core/MenuItem'
-import Menu from '@material-ui/core/Menu'
-import MoreIcon from '@material-ui/icons/MoreVert'
 
 import { ModalContext } from './ModalContext'
 import SignupLoginModal from './SignupLoginModal'
+import RecipeModal from './RecipeModal'
 import Auth from '../lib/Auth'
+import AppBarCustom from './AppBar'
+import CollapseOnScroll from './testing'
 
 const drawerWidth = 240
 
@@ -152,8 +141,9 @@ const Navigation = ({ children }) => {
 	const theme = useTheme()
 	const history = useHistory()
 	const [openDrawer, setOpenDrawer] = useState(true)
-	const { toggleModal } = useContext(ModalContext)
-	const [loggedIn, setLoggedIn] = useState(true) // not using loggedIn at the moment... move into useContext as this code won't allow multiple login logouts
+	const { toggleModal, toggleRecipe, loggedIn, setLoggedIn } = useContext(
+		ModalContext
+	)
 
 	const toggleDrawer = () => {
 		setOpenDrawer(!openDrawer)
@@ -161,173 +151,18 @@ const Navigation = ({ children }) => {
 
 	const signout = () => {
 		Auth.logout()
-		setLoggedIn(false) // bit of a cheat to get 'Signup / Login' to reappear
+		setLoggedIn(!loggedIn)
 		history.push('/')
 	}
-
-	const [anchorEl, setAnchorEl] = React.useState(null)
-	const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null)
-
-	const isMenuOpen = Boolean(anchorEl)
-
-	useEffect(() => {
-		console.log('oi: ', anchorEl)
-	}, [anchorEl])
-
-	const isMobileMenuOpen = Boolean(mobileMoreAnchorEl)
-
-	const handleProfileMenuOpen = (event) => {
-		setAnchorEl(event.currentTarget)
-	}
-
-	const handleMobileMenuClose = () => {
-		setMobileMoreAnchorEl(null)
-	}
-
-	const handleMenuClose = () => {
-		setAnchorEl(null)
-		handleMobileMenuClose()
-	}
-
-	const handleMobileMenuOpen = (event) => {
-		setMobileMoreAnchorEl(event.currentTarget)
-	}
-
-	const menuId = 'primary-search-account-menu'
-	const renderMenu = (
-		<Menu
-			anchorEl={anchorEl}
-			anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-			id={menuId}
-			keepMounted
-			transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-			open={isMenuOpen}
-			onClose={handleMenuClose}
-		>
-			<MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-			<MenuItem onClick={handleMenuClose}>My account</MenuItem>
-		</Menu>
-	)
-
-	const mobileMenuId = 'primary-search-account-menu-mobile'
-	const renderMobileMenu = (
-		<Menu
-			anchorEl={mobileMoreAnchorEl}
-			anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-			id={mobileMenuId}
-			keepMounted
-			transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-			open={isMobileMenuOpen}
-			onClose={handleMobileMenuClose}
-		>
-			<MenuItem>
-				<IconButton aria-label="show 4 new mails" color="inherit">
-					<Badge badgeContent={4} color="secondary">
-						<MailIcon />
-					</Badge>
-				</IconButton>
-				<p>Messages</p>
-			</MenuItem>
-			<MenuItem>
-				<IconButton aria-label="show 11 new notifications" color="inherit">
-					<Badge badgeContent={11} color="secondary">
-						<NotificationsIcon />
-					</Badge>
-				</IconButton>
-				<p>Notifications</p>
-			</MenuItem>
-			<MenuItem onClick={handleProfileMenuOpen}>
-				<IconButton
-					aria-label="account of current user"
-					aria-controls="primary-search-account-menu"
-					aria-haspopup="true"
-					color="inherit"
-				>
-					<AccountCircle />
-				</IconButton>
-				<p>Profile</p>
-			</MenuItem>
-		</Menu>
-	)
 
 	return (
 		<>
 			<div className={classes.root}>
 				<CssBaseline />
-				<AppBar
-					style={{ background: '#2E3B55' }}
-					position="fixed"
-					className={clsx(classes.appBar, {
-						[classes.appBarShift]: openDrawer
-					})}
-				>
-					<Toolbar>
-						<IconButton
-							color="inherit"
-							aria-label="open drawer"
-							onClick={toggleDrawer}
-							edge="start"
-							className={clsx(classes.menuButton, openDrawer && classes.hide)}
-						>
-							<MenuIcon />
-						</IconButton>
-						<Typography variant="h6" noWrap>
-							MEAL-PLANNER
-						</Typography>
-						<div className={classes.search}>
-							<div className={classes.searchIcon}>
-								<SearchIcon />
-							</div>
-							<InputBase
-								placeholder="Search…"
-								classes={{
-									root: classes.inputRoot,
-									input: classes.inputInput
-								}}
-								inputProps={{ 'aria-label': 'search' }}
-							/>
-						</div>
-						<div className={classes.grow} />
-						<div className={classes.sectionDesktop}>
-							<IconButton aria-label="show 4 new mails" color="inherit">
-								<Badge badgeContent={4} color="secondary">
-									<MailIcon />
-								</Badge>
-							</IconButton>
-							<IconButton
-								aria-label="show 17 new notifications"
-								color="inherit"
-							>
-								<Badge badgeContent={17} color="secondary">
-									<NotificationsIcon />
-								</Badge>
-							</IconButton>
-							<IconButton
-								edge="end"
-								aria-label="account of current user"
-								aria-controls={menuId}
-								aria-haspopup="true"
-								onClick={handleProfileMenuOpen}
-								color="inherit"
-							>
-								<AccountCircle />
-							</IconButton>
-						</div>
-						<div className={classes.sectionMobile}>
-							<IconButton
-								aria-label="show more"
-								aria-controls={mobileMenuId}
-								aria-haspopup="true"
-								onClick={handleMobileMenuOpen}
-								color="inherit"
-							>
-								<MoreIcon />
-							</IconButton>
-						</div>
-					</Toolbar>
-				</AppBar>
-				{renderMobileMenu}
-				{renderMenu}
+				{/* why can't I pass both props in one object? */}
+				<CollapseOnScroll>
+					<AppBarCustom openDrawer={openDrawer} toggleDrawer={toggleDrawer} />
+				</CollapseOnScroll>
 				<Drawer
 					className={classes.drawer}
 					variant="persistent"
@@ -370,13 +205,13 @@ const Navigation = ({ children }) => {
 							</ListItemIcon>
 							<ListItemText>Browse recipes</ListItemText>
 						</ListItem>
-						<ListItem button>
+						<ListItem button component={Link} to="/collections">
 							<ListItemIcon>
 								<LocalLibraryIcon />
 							</ListItemIcon>
 							<ListItemText>Recipe collections</ListItemText>
 						</ListItem>
-						<ListItem button>
+						<ListItem button onClick={toggleRecipe}>
 							<ListItemIcon>
 								<LibraryAddIcon />
 							</ListItemIcon>
@@ -387,26 +222,6 @@ const Navigation = ({ children }) => {
 								<LocalGroceryStoreIcon />
 							</ListItemIcon>
 							<ListItemText>New shopping list</ListItemText>
-						</ListItem>
-						<ListItem button>
-							<ListItemIcon>
-								<SearchIcon />
-							</ListItemIcon>
-							<ListItemText>Search recipes</ListItemText>
-						</ListItem>
-						{/* {['All mail', 'Trash', 'Spam'].map((text, index) => (
-							<ListItem button key={text}>
-								<ListItemIcon>
-									{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-								</ListItemIcon>
-								<ListItemText primary={text} />
-							</ListItem>
-						))} */}
-						<ListItem button component={Link} to="/account">
-							<ListItemIcon>
-								<AccountBoxIcon />
-							</ListItemIcon>
-							<ListItemText>Account Settings</ListItemText>
 						</ListItem>
 					</List>
 				</Drawer>
@@ -420,6 +235,7 @@ const Navigation = ({ children }) => {
 				</main>
 			</div>
 			<SignupLoginModal />
+			<RecipeModal />
 		</>
 	)
 }

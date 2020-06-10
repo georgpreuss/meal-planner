@@ -4,8 +4,8 @@ const mongoose = require('mongoose')
 const userSettings = new mongoose.Schema({
 	userId: { type: mongoose.Schema.ObjectId, required: true, ref: 'User' },
 	score: { type: Number, required: true }, // add validation, e.g. 1-5 which can be displayed as yummy emojis?
-	prepEffort: { type: Number, required: true }, // add validation, e.g. 1-4
-	cookEffort: { type: Number, required: true }, // add validation, e.g. 1-4
+	prepTime: { type: Number, required: true }, // add validation, e.g. 1-4
+	cookTime: { type: Number, required: true }, // add validation, e.g. 1-4
 	serves: { type: Number, required: true }, // add validation - integers only
 	images: [{ type: String }] // work out way to store user images
 	// specialUtensils: [{ type: String }] // will impact effort levels
@@ -14,8 +14,9 @@ const userSettings = new mongoose.Schema({
 const ingredient = new mongoose.Schema({
 	// link to ingredientSchema where names are unique - users can add to that schema but when creating recipes ingredients will be taken from that collection
 	name: { type: String, required: true }, // e.g. pepper
-	quantity: { type: Number }, // 1
-	weight: { type: Number } // use mongoose pre validation to ensure at least one out of quantity and weight is provided
+	amount: { type: Number }, // e.g. 15 or 1
+	units: { type: Number }, // e.g. g or tbsp - use mongoose pre validation to ensure at least one out of quantity and weight is provided
+	notes: { type: String } // e.g. chopped, grated, etc.
 })
 
 const recipeSchema = new mongoose.Schema({

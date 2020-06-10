@@ -65,6 +65,7 @@ const Signup = ({ toggleForm }) => {
 	const handleChange = (e) => {
 		const data = { ...signup.data, [e.target.name]: e.target.value }
 		const errors = { ...signup.errors, [e.target.name]: '' }
+		console.log(data)
 		setSignup({ data, errors })
 	}
 

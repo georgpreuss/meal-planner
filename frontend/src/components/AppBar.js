@@ -135,10 +135,10 @@ const AppBarCustom = ({ openDrawer, toggleDrawer }) => {
 
 	const isMenuOpen = Boolean(anchorEl)
 
-	useEffect(() => {
-		console.log('app state openDrawer: ', openDrawer)
-		console.log('app state toggleDrawer: ', toggleDrawer)
-	}, [openDrawer])
+	// useEffect(() => {
+	// 	console.log('app state openDrawer: ', openDrawer)
+	// 	console.log('app state toggleDrawer: ', toggleDrawer)
+	// }, [openDrawer])
 
 	const isMobileMenuOpen = Boolean(mobileMoreAnchorEl)
 

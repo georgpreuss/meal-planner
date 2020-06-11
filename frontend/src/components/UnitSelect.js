@@ -2,15 +2,21 @@ import React from 'react'
 import TextField from '@material-ui/core/TextField'
 import Autocomplete from '@material-ui/lab/Autocomplete'
 
-const UnitSelect = ({ onChange }) => {
+// TODO fix same bug as in IngredientSelect
+const UnitSelect = ({ handleChangeIngredients, index, setValue }) => {
 	return (
 		<Autocomplete
+			autoComplete
+			autoHighlight
+			autoSelect
 			id="unit-select"
+			// value={setValue}
 			options={units}
 			getOptionLabel={(option) => option.name}
-			onChange={onChange}
-			// style={{ width: 300 }}
-			renderInput={(params) => <TextField {...params} />}
+			// onChange={onChange}
+			onBlur={(e) => handleChangeIngredients(index, e)}
+			style={{ width: 300 }}
+			renderInput={(params) => <TextField {...params} name="units" />}
 		/>
 	)
 }

@@ -59,14 +59,14 @@ const RecipeModal = () => {
 	})
 	const [method, setMethod] = useState([''])
 
-	const [ingredients, setIngredients] = useState([
-		{
-			name: '',
-			amount: null,
-			units: '',
-			notes: ''
-		}
-	])
+	// const [ingredients, setIngredients] = useState([
+	// 	{
+	// 		name: '',
+	// 		amount: null,
+	// 		units: '',
+	// 		notes: ''
+	// 	}
+	// ])
 
 	const handleChange = (e) => {
 		const data = { ...recipe.data, [e.target.name]: e.target.value }
@@ -74,19 +74,23 @@ const RecipeModal = () => {
 		setRecipe({ data, errors })
 	}
 
+	// TODO swap e and index in args
 	const handleChangeMethod = (index, e) => {
 		const values = [...method]
 		values[index] = e.target.value
-		setMethod(values)
-		// SET recipe.data.method
+		setMethod(values) // take this out and all instances it affects
+		const data = { ...recipe.data, method: values }
+		setRecipe({ data })
 	}
 
-	const handleChangeIngredients = (index, e) => {
-		const values = [...ingredients]
-		values[index][e.target.name] = e.target.value
-		console.log('ingredients: ', values)
-		setIngredients(values)
-	}
+	// TODO swap e and index in args
+	// const handleChangeIngredients = (index, e) => {
+	// 	const values = [...ingredients]
+	// 	values[index][e.target.name] = e.target.value
+	// 	setIngredients(values) // take this out and all instances it affects
+	// 	const data = { ...recipe.data, ingredients: values }
+	// 	setRecipe({ data })
+	// }
 
 	const handleSubmit = (e) => {
 		e.preventDefault()
@@ -105,23 +109,32 @@ const RecipeModal = () => {
 		setMethod(values)
 	}
 
-	const addIngredient = () => {
-		const values = [...ingredients]
-		values.push({
-			name: '',
-			amount: null,
-			units: '',
-			notes: ''
-		})
-		setIngredients(values)
-	}
+	// const addIngredient = () => {
+	// 	const values = [...ingredients]
+	// 	values.push({
+	// 		name: '',
+	// 		amount: null,
+	// 		units: '',
+	// 		notes: ''
+	// 	})
+	// 	setIngredients(values)
+	// }
 
-	useEffect(() => {
-		const arrayLength = ingredients.length
-		if (ingredients[arrayLength - 1].amount !== null) {
-			addIngredient()
-		}
-	}, [ingredients])
+	// const removeIngredient = (index) => {
+	// 	console.log('index to remove: ', index)
+	// 	const values = [...ingredients]
+	// 	values.splice(index, 1)
+	// 	console.log('values are now: ', values)
+	// 	setIngredients(values)
+	// }
+
+	// REACTIVATE ONCE BUGS FIXED
+	// useEffect(() => {
+	// 	const arrayLength = ingredients.length
+	// 	if (ingredients[arrayLength - 1].amount !== null) {
+	// 		addIngredient()
+	// 	}
+	// }, [ingredients])
 
 	return (
 		<section className="section">
@@ -204,8 +217,12 @@ const RecipeModal = () => {
 							</div>
 							<div>
 								<IngredientsTable
-									ingredients={ingredients}
-									handleChangeIngredients={handleChangeIngredients}
+									recipe={recipe}
+									setRecipe={setRecipe}
+									// ingredients={ingredients}
+									// handleChangeIngredients={handleChangeIngredients}
+									// addIngredient={addIngredient}
+									// removeIngredient={removeIngredient}
 								/>
 								{/* TODO: same margin and styling as ingredients */}
 								<h1 className="title is-5">Recipe Steps</h1>

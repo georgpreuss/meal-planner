@@ -36,9 +36,7 @@ const IngredientsTable = ({ recipe, setRecipe }) => {
 		const values = [...ingredients]
 		values[index][e.target.name] = e.target.value
 		setIngredients(values) // take this out and all instances it affects
-		console.log('values: ', values)
 		const data = { ...recipe.data, ingredients: values }
-		console.log('data: ', data)
 		setRecipe({ data })
 	}
 
@@ -54,12 +52,9 @@ const IngredientsTable = ({ recipe, setRecipe }) => {
 	}
 
 	const removeIngredient = (index) => {
-		console.log('index to remove: ', index)
 		const values = [...ingredients]
 		values.splice(index, 1)
-		console.log('values about to be set: ', values)
 		setIngredients(values)
-		console.log('values just set: ', values)
 	}
 
 	return (
@@ -81,7 +76,6 @@ const IngredientsTable = ({ recipe, setRecipe }) => {
 						<TableCell align="right">diced</TableCell>
 					</TableRow>
 					{ingredients.map((ingredient, i) => {
-						console.log('index: ', i, 'ingredient.name: ', ingredient.name)
 						return (
 							<TableRow key={i}>
 								<TableCell>
@@ -101,7 +95,7 @@ const IngredientsTable = ({ recipe, setRecipe }) => {
 								</TableCell>
 								<TableCell align="right">
 									<UnitSelect
-										setValue={ingredient.units}
+										value={ingredient.units}
 										handleChangeIngredients={handleChangeIngredients}
 										index={i}
 									/>
@@ -113,12 +107,7 @@ const IngredientsTable = ({ recipe, setRecipe }) => {
 										onChange={(e) => handleChangeIngredients(i, e)}
 									/>
 									{ingredients.length > 1 && (
-										<IconButton
-											onClick={() => {
-												console.log('index is: ', i)
-												removeIngredient(i)
-											}}
-										>
+										<IconButton onClick={() => removeIngredient(i)}>
 											<RemoveIcon />
 										</IconButton>
 									)}

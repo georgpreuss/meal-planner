@@ -4,7 +4,7 @@ import Autocomplete from '@material-ui/lab/Autocomplete'
 
 // TODO address error message on input clear - doesn't happen with arr of strings as options (and no getOptionLabel)
 
-const UnitSelect = ({ handleChangeIngredients, index }) => {
+const UnitSelect = ({ handleChangeIngredients, index, value }) => {
 	const [selectedUnit, setSelectedUnit] = useState('')
 	const [inputValue, setInputValue] = useState('')
 
@@ -14,14 +14,14 @@ const UnitSelect = ({ handleChangeIngredients, index }) => {
 			autoHighlight
 			autoSelect
 			id="unit-select"
-			options={units}
-			getOptionLabel={(option) => option.name}
-			value={selectedUnit.name}
+			options={units.map((unit) => unit.name)} // clear icon appears when I do this but disappears when I don't map and pass the entire object
+			// getOptionLabel={(option) => option.name}
+			value={value}
 			onChange={(e, newValue) => {
-				setSelectedUnit(newValue.name)
+				setSelectedUnit(newValue)
 				const newE = {
 					...e,
-					target: { ...e.target, value: newValue.name, name: 'units' }
+					target: { ...e.target, value: newValue, name: 'units' }
 				}
 				handleChangeIngredients(index, newE)
 			}}

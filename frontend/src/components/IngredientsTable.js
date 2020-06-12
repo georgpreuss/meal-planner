@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { makeStyles } from '@material-ui/core/styles'
 import Table from '@material-ui/core/Table'
 import TableBody from '@material-ui/core/TableBody'
@@ -20,18 +20,7 @@ const useStyles = makeStyles({
 	}
 })
 
-// function createData(name, calories, fat, carbs, protein) {
-// 	return { name, calories, fat, carbs, protein }
-// }
-
-const IngredientsTable = ({
-	recipe,
-	setRecipe
-	// ingredients,
-	// handleChangeIngredients,
-	// addIngredient,
-	// removeIngredient
-}) => {
+const IngredientsTable = ({ recipe, setRecipe }) => {
 	const classes = useStyles()
 	const [ingredients, setIngredients] = useState([
 		{
@@ -47,7 +36,9 @@ const IngredientsTable = ({
 		const values = [...ingredients]
 		values[index][e.target.name] = e.target.value
 		setIngredients(values) // take this out and all instances it affects
+		console.log('values: ', values)
 		const data = { ...recipe.data, ingredients: values }
+		console.log('data: ', data)
 		setRecipe({ data })
 	}
 
@@ -70,11 +61,6 @@ const IngredientsTable = ({
 		setIngredients(values)
 		console.log('values just set: ', values)
 	}
-	// const [selectedIngredient, setSelectedIngredient] = useState('')
-
-	useEffect(() => {
-		console.log('setting ingredients')
-	}, [ingredients])
 
 	return (
 		<TableContainer component={Paper}>
@@ -95,17 +81,14 @@ const IngredientsTable = ({
 						<TableCell align="right">diced</TableCell>
 					</TableRow>
 					{ingredients.map((ingredient, i) => {
+						console.log('index: ', i, 'ingredient.name: ', ingredient.name)
 						return (
 							<TableRow key={i}>
 								<TableCell>
 									<IngredientSelect
-										// name="name"
-										// value={selectedIngredient}
-										// selectedIngredient={selectedIngredient}
-										// setSelectedIngredient={setSelectedIngredient}
 										handleChangeIngredients={handleChangeIngredients}
 										index={i}
-										// onChange={() => console.log(selectedIngredient)}
+										value={ingredient.name}
 									/>
 								</TableCell>
 								<TableCell align="right">
@@ -118,7 +101,6 @@ const IngredientsTable = ({
 								</TableCell>
 								<TableCell align="right">
 									<UnitSelect
-										// name="units"
 										setValue={ingredient.units}
 										handleChangeIngredients={handleChangeIngredients}
 										index={i}

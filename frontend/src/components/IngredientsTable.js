@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { makeStyles } from '@material-ui/core/styles'
 import Table from '@material-ui/core/Table'
 import TableBody from '@material-ui/core/TableBody'
@@ -20,42 +20,13 @@ const useStyles = makeStyles({
 	}
 })
 
-const IngredientsTable = ({ recipe, setRecipe }) => {
+const IngredientsTable = ({
+	ingredients,
+	handleChangeIngredients,
+	addIngredient,
+	removeIngredient
+}) => {
 	const classes = useStyles()
-	const [ingredients, setIngredients] = useState([
-		{
-			name: '',
-			amount: '', // needs to be number but get error messages
-			units: '',
-			notes: ''
-		}
-	])
-
-	// TODO swap e and index in args
-	const handleChangeIngredients = (index, e) => {
-		const values = [...ingredients]
-		values[index][e.target.name] = e.target.value
-		setIngredients(values) // take this out and all instances it affects
-		const data = { ...recipe.data, ingredients: values }
-		setRecipe({ data })
-	}
-
-	const addIngredient = () => {
-		const values = [...ingredients]
-		values.push({
-			name: '',
-			amount: '',
-			units: '',
-			notes: ''
-		})
-		setIngredients(values)
-	}
-
-	const removeIngredient = (index) => {
-		const values = [...ingredients]
-		values.splice(index, 1)
-		setIngredients(values)
-	}
 
 	return (
 		<TableContainer component={Paper}>

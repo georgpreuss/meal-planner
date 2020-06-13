@@ -15,7 +15,7 @@ const ingredient = new mongoose.Schema({
 	// link to ingredientSchema where names are unique - users can add to that schema but when creating recipes ingredients will be taken from that collection
 	name: { type: String, required: true }, // e.g. pepper
 	amount: { type: Number }, // e.g. 15 or 1
-	units: { type: Number }, // e.g. g or tbsp - use mongoose pre validation to ensure at least one out of quantity and weight is provided
+	units: { type: String }, // e.g. g or tbsp - use mongoose pre validation to ensure at least one out of quantity and weight is provided
 	notes: { type: String } // e.g. chopped, grated, etc.
 })
 
@@ -24,8 +24,8 @@ const recipeSchema = new mongoose.Schema({
 	originalAuthor: { type: String }, // make sure to give credit to the author
 	userSettings: [userSettings],
 	averageScore: { type: Number }, // empty at creation but then average of peer review scores
-	prepEffort: { type: Number, required: true }, // empty at creation but then average of userSettings
-	cookEffort: { type: Number, required: true }, // empty at creation but then average of userSettings
+	prepTime: { type: Number, required: true }, // empty at creation but then average of userSettings
+	cookTime: { type: Number, required: true }, // empty at creation but then average of userSettings
 	serves: { type: Number, required: true },
 	image: { type: String },
 	// cuisine: { type: String, required: true },

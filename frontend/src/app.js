@@ -11,6 +11,7 @@ import Navigation from './components/Navigation'
 import LandingPage from './components/LandingPage'
 import RecipeCollections from './components/RecipeCollections'
 import AccountSettings from './components/AccountSettings'
+import RecipeView from './components/RecipeView'
 
 const App = () => {
 	return (
@@ -19,10 +20,11 @@ const App = () => {
 				<Navigation>
 					<Switch>
 						<Route exact path="/" component={LandingPage} />
+						<Route exact path="/recipe/:recipeId" component={RecipeView} />
 						<SecureRoute exact path="/account" component={AccountSettings} />
 						<SecureRoute
 							exact
-							path="/collections"
+							path="/collections/:userId?"
 							component={RecipeCollections}
 						/>
 					</Switch>

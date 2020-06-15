@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 import { makeStyles } from '@material-ui/core/styles'
 import clsx from 'clsx'
 import Card from '@material-ui/core/Card'
@@ -42,7 +43,7 @@ const useStyles = makeStyles((theme) => ({
 	}
 }))
 
-const RecipeCard = () => {
+const RecipeCard = ({ recipe }) => {
 	const classes = useStyles()
 	const [expanded, setExpanded] = React.useState(false)
 
@@ -63,16 +64,21 @@ const RecipeCard = () => {
 						<MoreVertIcon />
 					</IconButton>
 				}
-				title="Shrimp and Chorizo Paella"
-				subheader="Charlie S"
+				title={recipe.title}
+				subheader={recipe.source}
+				// TODO change styling: remove link default styling
+				component={Link}
+				to={`/recipe/${recipe._id}`}
 			/>
 			<Container>
 				<SimpleRating />
 			</Container>
 			<CardMedia
 				className={classes.media}
-				image="https://www.simplyrecipes.com/wp-content/uploads/2018/07/Seafood-Paella-LEAD-VERTICAL.jpg"
-				title="Paella dish"
+				image={recipe.image}
+				component={Link}
+				to={`/recipe/${recipe._id}`}
+				// title="Paella dish"
 			/>
 			{/* <CardContent>
 			
@@ -102,9 +108,7 @@ const RecipeCard = () => {
 			<Collapse in={expanded} timeout="auto" unmountOnExit>
 				<CardContent>
 					<Typography variant="body2" color="textSecondary" component="p">
-						This impressive paella is a perfect party dish and a fun meal to
-						cook together with your guests. Add 1 cup of frozen peas along with
-						the mussels, if you like.
+						{recipe.description}
 					</Typography>
 				</CardContent>
 			</Collapse>

@@ -103,10 +103,6 @@ const deleteRecipe = (req, res, next) => {
 	// only allow delete if recipe.downloadedByUser is empty && recipe.descendants is empty
 }
 
-const saveToCollection = (req, res, next) => {}
-
-const removeFromCollection = (req, res, next) => {}
-
 const getRecipesByCreator = (req, res, next) => {
 	Recipe.find({ creatorId: req.params.creatorId })
 		.then((recipes) => res.status(200).json(recipes))

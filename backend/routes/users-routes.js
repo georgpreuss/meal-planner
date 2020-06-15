@@ -21,7 +21,12 @@ router.post(
 router.post('/login', usersControllers.login)
 
 router
-	.route('/:userId')
+	.route('/collection')
+	.put(secureRoute, usersControllers.saveToCollection)
+	.delete(secureRoute, usersControllers.removeFromCollection)
+
+router
+	.route('/:userId') // careful, could create issue with /signup if you also add post
 	.get(usersControllers.getProfile)
 	.put(secureRoute, usersControllers.changeProfile)
 	.delete(secureRoute, usersControllers.deleteAccount)

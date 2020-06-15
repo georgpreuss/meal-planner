@@ -1,8 +1,10 @@
 // const { validationResult } = require('express-validator')
 const jwt = require('jsonwebtoken')
 const nodemailer = require('nodemailer')
+const mongoose = require('mongoose')
 
 const User = require('../models/user')
+const Recipe = require('../models/recipe')
 const { port } = require('../config/environment')
 
 const checkAvailable = (req, res, next) => {
@@ -141,6 +143,96 @@ const forgotPassword = (req, res, next) => {
 		  })
 }
 
+const saveToCollection = (req, res, next) => {
+	const userId = req.currentUser._id
+	const { recipeId } = req.body
+	console.log(userId)
+	console.log(recipeId)
+	let user
+	let recipe
+	let session = null // does it need to be initialised as null?
+	User.findById(userId)
+		.then((u) => (user = u))
+		.then(() => {
+			Recipe.findById(recipeId).then((r) => {
+				console.log('user: ', user)
+				console.log('r: ', r)
+				recipe = r
+				console.log('recipe1: ', recipe)
+				if (user.recipeCollection.includes(recipeId)) {
+					return res
+						.status(400)
+						.json({ message: 'this recipe already is in your collection' })
+				} else {
+					mongoose
+						.startSession()
+						.then((_session) => {
+							session = _session
+							session.startTransaction()
+							user.recipeCollection.push(recipeId)
+							user.save({ session })
+							// to not add duplicates to downloadedBy array
+							if (!recipe.downloadedByUser.includes(userId)) {
+								recipe.downloadedByUser.push(userId)
+							}
+							recipe.save({ session })
+							session.commitTransaction()
+						})
+						.then(() =>
+							res.status(201).json({ message: 'recipe added to collection' })
+						)
+						.catch((error) => res.status(500).json(error))
+				}
+			})
+		})
+		.then(() => console.log('user: ', user, 'recipe2: ', recipe))
+		.catch((error) => res.status(500).json(error))
+}
+
+const removeFromCollection = (req, res, next) => {
+	const userId = req.currentUser._id
+	const { recipeId } = req.body
+	let user
+	let recipe
+	let session = null // does it need to be initialised as null?
+	User.findById(userId)
+		.then((u) => (user = u))
+		.then(() => {
+			Recipe.findById(recipeId).then((r) => {
+				recipe = r
+				if (!user.recipeCollection.includes(recipeId)) {
+					return res
+						.status(400)
+						.json({ message: 'could not find this recipe in your collection' })
+				} else {
+					mongoose
+						.startSession()
+						.then((_session) => {
+							session = _session
+							session.startTransaction()
+							const index = user.recipeCollection.indexOf(recipeId)
+							user.recipeCollection.splice(index, 1)
+							user.save({ session })
+							if (recipe.downloadedByUser.includes(userId)) {
+								const index = recipe.downloadedByUser.indexOf(userId)
+								recipe.downloadedByUser.splice(index, 1)
+							}
+							recipe.save({ session })
+							session.commitTransaction()
+						})
+						.then(() =>
+							res
+								.status(202)
+								.json({ message: 'recipe removed from your collection' })
+						)
+						.catch((error) => res.status(500).json(error))
+				}
+			})
+		})
+		.then(() => console.log('user: ', user, 'recipe2: ', recipe))
+		.catch((error) => res.status(500).json(error))
+}
+
 module.exports = {
 	checkAvailable,
 	signup,
@@ -148,5 +240,7 @@ module.exports = {
 	getProfile,
 	changeProfile,
 	deleteAccount,
-	forgotPassword
+	forgotPassword,
+	saveToCollection,
+	removeFromCollection
 }

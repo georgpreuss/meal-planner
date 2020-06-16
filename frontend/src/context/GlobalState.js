@@ -22,7 +22,7 @@ const GlobalState = ({ children }) => {
 		axios.get('api/recipes').then((resp) => {
 			setRecipes(resp.data)
 		})
-	}, [collectionIds]) // only get it once - look into socket.io implementation to push changes from database?
+	}, []) // only get it once - look into socket.io implementation to push changes from database?
 
 	// grap user profile on login
 	useEffect(() => {

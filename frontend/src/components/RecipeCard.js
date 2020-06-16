@@ -19,6 +19,7 @@ import ShareIcon from '@material-ui/icons/Share'
 import BookmarkBorderIcon from '@material-ui/icons/BookmarkBorder'
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 import MoreVertIcon from '@material-ui/icons/MoreVert'
+import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline'
 import Container from '@material-ui/core/Container'
 import SimpleRating from './Rating'
 import Auth from '../lib/Auth'
@@ -50,7 +51,7 @@ const useStyles = makeStyles((theme) => ({
 const RecipeCard = ({ recipe }) => {
 	const classes = useStyles()
 	const [expanded, setExpanded] = useState(false)
-	const { setCollectionIds } = useContext(ModalContext)
+	const { collectionIds, setCollectionIds } = useContext(ModalContext)
 
 	const handleExpandClick = () => {
 		setExpanded(!expanded)
@@ -65,20 +66,17 @@ const RecipeCard = ({ recipe }) => {
 					headers: { Authorization: `Bearer ${Auth.getToken()}` }
 				}
 			)
-			.then((resp) => {
-				setCollectionIds(resp.data.collection)
-			})
+			.then((resp) => setCollectionIds(resp.data.collection))
 			.catch((error) => console.log(error))
 	}
 
 	const removeFromCollection = () => {
 		axios
-			.delete(
-				'/api/users/collection',
-				{ recipeId: recipe._id },
-				{ headers: { Authorization: `Bearer ${Auth.getToken()}` } }
-			)
-			.then((resp) => console.log(resp))
+			.delete('/api/users/collection', {
+				headers: { Authorization: `Bearer ${Auth.getToken()}` },
+				data: { recipeId: recipe._id }
+			})
+			.then((resp) => setCollectionIds(resp.data.collection))
 			.catch((error) => console.log(error))
 	}
 
@@ -110,7 +108,6 @@ const RecipeCard = ({ recipe }) => {
 				image={recipe.image}
 				component={Link}
 				to={`/recipe/${recipe._id}`}
-				// title="Paella dish"
 			/>
 			{/* <CardContent>
 			
@@ -122,10 +119,16 @@ const RecipeCard = ({ recipe }) => {
 				<IconButton aria-label="share">
 					<ShareIcon />
 				</IconButton>
-				{Auth.isAuthorized() ? ( // add logic to check if in collection
-					<IconButton aria-label="save" onClick={saveToCollection}>
-						<BookmarkBorderIcon />
-					</IconButton>
+				{Auth.isAuthorized() ? (
+					!collectionIds.includes(recipe._id) ? (
+						<IconButton aria-label="save" onClick={saveToCollection}>
+							<BookmarkBorderIcon />
+						</IconButton>
+					) : (
+						<IconButton aria-label="save" onClick={removeFromCollection}>
+							<DeleteOutlineIcon />
+						</IconButton>
+					)
 				) : (
 					<IconButton aria-label="save">
 						<BookmarkBorderIcon />

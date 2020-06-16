@@ -146,8 +146,6 @@ const forgotPassword = (req, res, next) => {
 const saveToCollection = (req, res, next) => {
 	const userId = req.currentUser._id
 	const { recipeId } = req.body
-	console.log(userId)
-	console.log(recipeId)
 	let user
 	let recipe
 	let session = null // does it need to be initialised as null?
@@ -155,10 +153,7 @@ const saveToCollection = (req, res, next) => {
 		.then((u) => (user = u))
 		.then(() => {
 			Recipe.findById(recipeId).then((r) => {
-				console.log('user: ', user)
-				console.log('r: ', r)
 				recipe = r
-				console.log('recipe1: ', recipe)
 				if (user.recipeCollection.includes(recipeId)) {
 					return res
 						.status(400)
@@ -188,7 +183,6 @@ const saveToCollection = (req, res, next) => {
 				}
 			})
 		})
-		.then(() => console.log('user: ', user, 'recipe2: ', recipe))
 		.catch((error) => res.status(500).json(error))
 }
 
@@ -224,15 +218,15 @@ const removeFromCollection = (req, res, next) => {
 							session.commitTransaction()
 						})
 						.then(() =>
-							res
-								.status(202)
-								.json({ message: 'recipe removed from your collection' })
+							res.status(202).json({
+								message: 'recipe removed from your collection',
+								collection: user.recipeCollection
+							})
 						)
 						.catch((error) => res.status(500).json(error))
 				}
 			})
 		})
-		.then(() => console.log('user: ', user, 'recipe2: ', recipe))
 		.catch((error) => res.status(500).json(error))
 }
 

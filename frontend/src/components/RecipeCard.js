@@ -1,5 +1,7 @@
-import React from 'react'
+import React, { useState, useContext } from 'react'
 import { Link } from 'react-router-dom'
+import axios from 'axios'
+
 import { makeStyles } from '@material-ui/core/styles'
 import clsx from 'clsx'
 import Card from '@material-ui/core/Card'
@@ -19,6 +21,8 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 import MoreVertIcon from '@material-ui/icons/MoreVert'
 import Container from '@material-ui/core/Container'
 import SimpleRating from './Rating'
+import Auth from '../lib/Auth'
+import { ModalContext } from './ModalContext'
 
 const useStyles = makeStyles((theme) => ({
 	root: {
@@ -45,10 +49,36 @@ const useStyles = makeStyles((theme) => ({
 
 const RecipeCard = ({ recipe }) => {
 	const classes = useStyles()
-	const [expanded, setExpanded] = React.useState(false)
+	const [expanded, setExpanded] = useState(false)
+	const { setUpdatedCollection } = useContext(ModalContext)
 
 	const handleExpandClick = () => {
 		setExpanded(!expanded)
+	}
+
+	const saveToCollection = () => {
+		console.log('recipe.id: ', recipe._id)
+		axios
+			.put(
+				'/api/users/collection',
+				{ recipeId: recipe._id },
+				{
+					headers: { Authorization: `Bearer ${Auth.getToken()}` }
+				}
+			)
+			.then((resp) => setUpdatedCollection(resp))
+			.catch((error) => console.log(error))
+	}
+
+	const removeFromCollection = () => {
+		axios
+			.delete(
+				'/api/users/collection',
+				{ recipeId: recipe._id },
+				{ headers: { Authorization: `Bearer ${Auth.getToken()}` } }
+			)
+			.then((resp) => console.log(resp))
+			.catch((error) => console.log(error))
 	}
 
 	return (
@@ -64,6 +94,7 @@ const RecipeCard = ({ recipe }) => {
 						<MoreVertIcon />
 					</IconButton>
 				}
+				disableTypography={false}
 				title={recipe.title}
 				subheader={recipe.source}
 				// TODO change styling: remove link default styling
@@ -90,10 +121,15 @@ const RecipeCard = ({ recipe }) => {
 				<IconButton aria-label="share">
 					<ShareIcon />
 				</IconButton>
-				<IconButton aria-label="save">
-					<BookmarkBorderIcon />
-					{/* normal BookmarkIcon if saved */}
-				</IconButton>
+				{Auth.isAuthorized() ? ( // add logic to check if in collection
+					<IconButton aria-label="save" onClick={saveToCollection}>
+						<BookmarkBorderIcon />
+					</IconButton>
+				) : (
+					<IconButton aria-label="save">
+						<BookmarkBorderIcon />
+					</IconButton>
+				)}
 				<IconButton
 					className={clsx(classes.expand, {
 						[classes.expandOpen]: expanded

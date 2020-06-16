@@ -10,6 +10,7 @@ const GlobalState = ({ children }) => {
 	const [recipeModal, setRecipeModal] = useState(false)
 
 	const [recipes, setRecipes] = useState([])
+	const [updatedCollection, setUpdatedCollection] = useState({})
 	const [loggedIn, setLoggedIn] = useState(false)
 	const [profile, setProfile] = useState({})
 
@@ -18,7 +19,7 @@ const GlobalState = ({ children }) => {
 		axios.get('api/recipes').then((resp) => {
 			setRecipes(resp.data)
 		})
-	}, [])
+	}, [updatedCollection])
 
 	useEffect(() => {
 		if (Auth.isAuthorized()) {
@@ -52,7 +53,8 @@ const GlobalState = ({ children }) => {
 				loggedIn,
 				setLoggedIn,
 				recipes,
-				profile
+				profile,
+				setUpdatedCollection
 			}}
 		>
 			{children}

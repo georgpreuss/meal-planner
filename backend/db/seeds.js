@@ -147,7 +147,7 @@ mongoose.connect(
 						version: 1,
 						ancestors: [],
 						descendants: [],
-						downloadedByUser: [],
+						downloadedByUser: [users[0]],
 						downloadedByGroup: []
 					},
 					{
@@ -242,7 +242,7 @@ mongoose.connect(
 						version: 1,
 						ancestors: [],
 						descendants: [],
-						downloadedByUser: [],
+						downloadedByUser: [users[1]],
 						downloadedByGroup: []
 					},
 					{
@@ -349,7 +349,7 @@ mongoose.connect(
 						version: 1,
 						ancestors: [],
 						descendants: [],
-						downloadedByUser: [],
+						downloadedByUser: [users[2]],
 						downloadedByGroup: []
 					},
 					{
@@ -470,7 +470,7 @@ mongoose.connect(
 						version: 1,
 						ancestors: [],
 						descendants: [],
-						downloadedByUser: [],
+						downloadedByUser: [users[2]],
 						downloadedByGroup: []
 					}
 				])

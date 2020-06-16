@@ -179,7 +179,10 @@ const saveToCollection = (req, res, next) => {
 							session.commitTransaction()
 						})
 						.then(() =>
-							res.status(201).json({ message: 'recipe added to collection' })
+							res.status(201).json({
+								message: 'recipe added to collection',
+								collection: user.recipeCollection
+							})
 						)
 						.catch((error) => res.status(500).json(error))
 				}

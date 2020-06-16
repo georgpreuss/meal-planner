@@ -50,14 +50,13 @@ const useStyles = makeStyles((theme) => ({
 const RecipeCard = ({ recipe }) => {
 	const classes = useStyles()
 	const [expanded, setExpanded] = useState(false)
-	const { setUpdatedCollection } = useContext(ModalContext)
+	const { setCollectionIds } = useContext(ModalContext)
 
 	const handleExpandClick = () => {
 		setExpanded(!expanded)
 	}
 
 	const saveToCollection = () => {
-		console.log('recipe.id: ', recipe._id)
 		axios
 			.put(
 				'/api/users/collection',
@@ -66,7 +65,9 @@ const RecipeCard = ({ recipe }) => {
 					headers: { Authorization: `Bearer ${Auth.getToken()}` }
 				}
 			)
-			.then((resp) => setUpdatedCollection(resp))
+			.then((resp) => {
+				setCollectionIds(resp.data.collection)
+			})
 			.catch((error) => console.log(error))
 	}
 

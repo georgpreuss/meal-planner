@@ -9,27 +9,31 @@ const GlobalState = ({ children }) => {
 	const [showModal, setShowModal] = useState(false)
 	const [recipeModal, setRecipeModal] = useState(false)
 
+	// store recipes retrieved from database and update here
 	const [recipes, setRecipes] = useState([])
-	const [updatedCollection, setUpdatedCollection] = useState({})
+	// store recipeCollection array (id's) retrieved from database and update here
+	const [collectionIds, setCollectionIds] = useState([])
+	// const [updatedCollection, setUpdatedCollection] = useState({})
 	const [loggedIn, setLoggedIn] = useState(false)
 	const [profile, setProfile] = useState({})
 
-	// TODO reload on recipes state change without reloading infinitely
+	// grab all recipes off database as soon as you access the website
 	useEffect(() => {
 		axios.get('api/recipes').then((resp) => {
 			setRecipes(resp.data)
 		})
-	}, [updatedCollection])
+	}, [collectionIds]) // only get it once - look into socket.io implementation to push changes from database?
 
+	// grap user profile on login
 	useEffect(() => {
 		if (Auth.isAuthorized()) {
-			console.log('getting profile')
 			const userId = Auth.getUserId()
 			axios.get(`api/users/${userId}`).then((resp) => {
 				setProfile(resp.data)
+				setCollectionIds(resp.data.recipeCollection)
 			})
 		}
-	}, [loggedIn])
+	}, [loggedIn]) // TODO check you need this dependency
 
 	const toggleModal = () => {
 		setShowModal(!showModal)
@@ -54,7 +58,8 @@ const GlobalState = ({ children }) => {
 				setLoggedIn,
 				recipes,
 				profile,
-				setUpdatedCollection
+				collectionIds,
+				setCollectionIds
 			}}
 		>
 			{children}

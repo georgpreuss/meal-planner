@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react'
+import React, { useContext } from 'react'
 import { makeStyles } from '@material-ui/core/styles'
 import Grid from '@material-ui/core/Grid'
 
@@ -16,19 +16,16 @@ const useStyles = makeStyles((theme) => ({
 	}
 }))
 
-const RecipeCollections = (props) => {
+const RecipeCollections = () => {
 	const classes = useStyles()
-	// const [collectionIds, setCollectionIds] = useState([])
-	// const [createdIds, setCreatedIds] = useState([])
-	const { recipes, profile } = useContext(ModalContext)
+	const { recipes, profile, collectionIds } = useContext(ModalContext)
 
-	const collectedIds = profile.recipeCollection // TODO change to recipesCollected ?
-	const createdIds = profile.recipesCreated
+	const createdIds = profile.recipesCreated // TODO replace with state
 
 	let collectedRecipes
-	if (collectedIds) {
+	if (collectionIds) {
 		collectedRecipes = recipes.filter((recipe) => {
-			return collectedIds.includes(recipe._id)
+			return collectionIds.includes(recipe._id)
 		})
 	}
 	let createdRecipes
@@ -66,17 +63,6 @@ const RecipeCollections = (props) => {
 						})}
 				</Grid>
 			</div>
-			{/* <h1>Recipes in collection</h1>
-			<RecipeCard />
-			{collected &&
-				collected.map((recipe, i) => {
-					return <h1 key={i}>{recipe}</h1>
-				})}
-			<h1>Recipes created</h1>
-			{created &&
-				created.map((recipe, i) => {
-					return <h1 key={i}>{recipe}</h1>
-				})} */}
 		</>
 	)
 }

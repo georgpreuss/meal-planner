@@ -34,7 +34,9 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 const RecipeModal = () => {
 	const classes = useStyles()
-	const { recipeModal, toggleRecipe } = useContext(ModalContext)
+	const { recipeModal, toggleRecipe, recipes, setRecipes } = useContext(
+		ModalContext
+	)
 	const [recipe, setRecipe] = useState({
 		data: {
 			title: '',
@@ -114,7 +116,9 @@ const RecipeModal = () => {
 				headers: { Authorization: `Bearer ${Auth.getToken()}` }
 			})
 			.then((resp) => {
-				console.log(resp)
+				const newRecipes = [...recipes]
+				newRecipes.push(resp.data.newRecipe)
+				setRecipes(newRecipes)
 				toggleRecipe()
 			})
 			.catch((errors) => {

@@ -11,8 +11,6 @@ const GlobalState = ({ children }) => {
 
 	// store recipes retrieved from database and update here
 	const [recipes, setRecipes] = useState([])
-	// store newly created recipes and update here
-	const [newRecipes, setNewRecipes] = useState([])
 	// store profile retrieved from database and update here
 	const [profile, setProfile] = useState({})
 	// store logged in state here
@@ -23,7 +21,7 @@ const GlobalState = ({ children }) => {
 		axios.get('api/recipes').then((resp) => {
 			setRecipes(resp.data)
 		})
-	}, [newRecipes]) // only get it once - look into socket.io implementation to push changes from database?
+	}, []) // only get it once - look into socket.io implementation to push changes from database?
 
 	// grap user profile on login
 	useEffect(() => {
@@ -57,6 +55,7 @@ const GlobalState = ({ children }) => {
 				loggedIn,
 				setLoggedIn,
 				recipes,
+				setRecipes,
 				profile,
 				setProfile // TODO add newRecipes and SetNewRecipes
 			}}

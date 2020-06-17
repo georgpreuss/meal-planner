@@ -12,7 +12,8 @@ const userSchema = new mongoose.Schema({
 	// utensils: [{ type: String }],
 	units: { type: String, required: true }, // e.g. metric or imperial - don't forget validation
 	recipesCreated: [{ type: mongoose.Types.ObjectId, ref: 'Recipe' }], // rename recipesCreated?
-	recipeCollection: [{ type: mongoose.Types.ObjectId, ref: 'Recipe' }] //
+	recipeCollection: [{ type: mongoose.Types.ObjectId, ref: 'Recipe' }],
+	favouriteRecipes: [{ type: mongoose.Types.ObjectId, ref: 'Recipe' }]
 })
 
 // create virtual passwordConfirmation field

@@ -11,18 +11,19 @@ const GlobalState = ({ children }) => {
 
 	// store recipes retrieved from database and update here
 	const [recipes, setRecipes] = useState([])
-	// store recipeCollection array (id's) retrieved from database and update here
-	const [collectionIds, setCollectionIds] = useState([])
-	// const [updatedCollection, setUpdatedCollection] = useState({})
-	const [loggedIn, setLoggedIn] = useState(false)
+	// store newly created recipes and update here
+	const [newRecipes, setNewRecipes] = useState([])
+	// store profile retrieved from database and update here
 	const [profile, setProfile] = useState({})
+	// store logged in state here
+	const [loggedIn, setLoggedIn] = useState(false)
 
 	// grab all recipes off database as soon as you access the website
 	useEffect(() => {
 		axios.get('api/recipes').then((resp) => {
 			setRecipes(resp.data)
 		})
-	}, []) // only get it once - look into socket.io implementation to push changes from database?
+	}, [newRecipes]) // only get it once - look into socket.io implementation to push changes from database?
 
 	// grap user profile on login
 	useEffect(() => {
@@ -30,7 +31,6 @@ const GlobalState = ({ children }) => {
 			const userId = Auth.getUserId()
 			axios.get(`api/users/${userId}`).then((resp) => {
 				setProfile(resp.data)
-				setCollectionIds(resp.data.recipeCollection)
 			})
 		}
 	}, [loggedIn]) // TODO check you need this dependency
@@ -58,8 +58,7 @@ const GlobalState = ({ children }) => {
 				setLoggedIn,
 				recipes,
 				profile,
-				collectionIds,
-				setCollectionIds
+				setProfile // TODO add newRecipes and SetNewRecipes
 			}}
 		>
 			{children}

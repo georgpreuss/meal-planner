@@ -23,6 +23,7 @@ const createRecipe = (req, res, next) => {
 		ancestors: [],
 		descendants: [],
 		downloadedByUser: [],
+		favouritedBy: [],
 		downloadedByGroup: []
 	})
 	let user

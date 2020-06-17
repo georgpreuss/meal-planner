@@ -42,6 +42,7 @@ const recipeSchema = new mongoose.Schema({
 	ancestors: [{ type: mongoose.Schema.ObjectId, ref: 'Recipe' }],
 	descendants: [{ type: mongoose.Schema.ObjectId, ref: 'Recipe' }],
 	downloadedByUser: [{ type: mongoose.Schema.ObjectId, ref: 'User' }],
+	favouritedBy: [{ type: mongoose.Schema.ObjectId, ref: 'User' }],
 	downloadedByGroup: [{ type: String }] // change to group ids
 })
 

@@ -230,6 +230,93 @@ const removeFromCollection = (req, res, next) => {
 		.catch((error) => res.status(500).json(error))
 }
 
+const saveToFavourites = (req, res, next) => {
+	const userId = req.currentUser._id
+	const { recipeId } = req.body
+	let user
+	let recipe
+	let session = null // does it need to be initialised as null?
+	User.findById(userId)
+		.then((u) => (user = u))
+		.then(() => {
+			Recipe.findById(recipeId).then((r) => {
+				recipe = r
+				if (user.favouriteRecipes.includes(recipeId)) {
+					return res
+						.status(400)
+						.json({ message: 'this recipe already is in your favourites' })
+				} else {
+					mongoose
+						.startSession()
+						.then((_session) => {
+							session = _session
+							session.startTransaction()
+							user.favouriteRecipes.push(recipeId)
+							user.save({ session })
+							// to not add duplicates to downloadedBy array
+							if (!recipe.favouritedBy.includes(userId)) {
+								recipe.favouritedBy.push(userId)
+							}
+							recipe.save({ session })
+							session.commitTransaction()
+						})
+						.then(() =>
+							res.status(201).json({
+								message: 'recipe added to favourites',
+								favourites: user.favouriteRecipes
+							})
+						)
+						.catch((error) => res.status(500).json(error))
+				}
+			})
+		})
+		.catch((error) => res.status(500).json(error))
+}
+
+const removeFromFavourites = (req, res, next) => {
+	const userId = req.currentUser._id
+	const { recipeId } = req.body
+	let user
+	let recipe
+	let session = null // does it need to be initialised as null?
+	User.findById(userId)
+		.then((u) => (user = u))
+		.then(() => {
+			Recipe.findById(recipeId).then((r) => {
+				recipe = r
+				if (!user.favouriteRecipes.includes(recipeId)) {
+					return res
+						.status(400)
+						.json({ message: 'could not find this recipe in your favourites' })
+				} else {
+					mongoose
+						.startSession()
+						.then((_session) => {
+							session = _session
+							session.startTransaction()
+							const index = user.favouriteRecipes.indexOf(recipeId)
+							user.favouriteRecipes.splice(index, 1)
+							user.save({ session })
+							if (recipe.downloadedByUser.includes(userId)) {
+								const index = recipe.downloadedByUser.indexOf(userId)
+								recipe.downloadedByUser.splice(index, 1)
+							}
+							recipe.save({ session })
+							session.commitTransaction()
+						})
+						.then(() =>
+							res.status(202).json({
+								message: 'recipe removed from your favourites',
+								favourites: user.favouriteRecipes
+							})
+						)
+						.catch((error) => res.status(500).json(error))
+				}
+			})
+		})
+		.catch((error) => res.status(500).json(error))
+}
+
 module.exports = {
 	checkAvailable,
 	signup,
@@ -239,5 +326,7 @@ module.exports = {
 	deleteAccount,
 	forgotPassword,
 	saveToCollection,
-	removeFromCollection
+	removeFromCollection,
+	saveToFavourites,
+	removeFromFavourites
 }

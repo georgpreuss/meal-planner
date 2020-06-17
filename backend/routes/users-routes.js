@@ -26,6 +26,11 @@ router
 	.delete(secureRoute, usersControllers.removeFromCollection)
 
 router
+	.route('/favourites')
+	.put(secureRoute, usersControllers.saveToFavourites)
+	.delete(secureRoute, usersControllers.removeFromFavourites)
+
+router
 	.route('/:userId') // careful, could create issue with /signup if you also add post
 	.get(usersControllers.getProfile)
 	.put(secureRoute, usersControllers.changeProfile)

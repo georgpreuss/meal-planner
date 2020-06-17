@@ -9,9 +9,9 @@ import GlobalState from './context/GlobalState'
 import SecureRoute from './lib/SecureRoute'
 import Navigation from './components/Navigation'
 import LandingPage from './components/LandingPage'
-import RecipeCollections from './components/RecipeCollections'
 import AccountSettings from './components/AccountSettings'
 import RecipeView from './components/RecipeView'
+import CollectionTabs from './components/CollectionTabs'
 
 const App = () => {
 	return (
@@ -25,7 +25,7 @@ const App = () => {
 						<SecureRoute
 							exact
 							path="/collections/:userId?"
-							component={RecipeCollections}
+							component={CollectionTabs}
 						/>
 					</Switch>
 				</Navigation>

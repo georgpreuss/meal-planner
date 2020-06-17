@@ -14,12 +14,14 @@ import Avatar from '@material-ui/core/Avatar'
 import IconButton from '@material-ui/core/IconButton'
 import Typography from '@material-ui/core/Typography'
 import { red } from '@material-ui/core/colors'
+import FavoriteBorderIcon from '@material-ui/icons/FavoriteBorder'
 import FavoriteIcon from '@material-ui/icons/Favorite'
 import ShareIcon from '@material-ui/icons/Share'
 import BookmarkBorderIcon from '@material-ui/icons/BookmarkBorder'
+import BookmarkIcon from '@material-ui/icons/Bookmark'
+import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline'
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 import MoreVertIcon from '@material-ui/icons/MoreVert'
-import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline'
 import Container from '@material-ui/core/Container'
 import SimpleRating from './Rating'
 import Auth from '../lib/Auth'
@@ -51,7 +53,7 @@ const useStyles = makeStyles((theme) => ({
 const RecipeCard = ({ recipe }) => {
 	const classes = useStyles()
 	const [expanded, setExpanded] = useState(false)
-	const { collectionIds, setCollectionIds } = useContext(ModalContext)
+	const { profile, setProfile } = useContext(ModalContext)
 
 	const handleExpandClick = () => {
 		setExpanded(!expanded)
@@ -66,7 +68,9 @@ const RecipeCard = ({ recipe }) => {
 					headers: { Authorization: `Bearer ${Auth.getToken()}` }
 				}
 			)
-			.then((resp) => setCollectionIds(resp.data.collection))
+			.then((resp) => {
+				setProfile({ ...profile, recipeCollection: resp.data.collection })
+			})
 			.catch((error) => console.log(error))
 	}
 
@@ -76,7 +80,36 @@ const RecipeCard = ({ recipe }) => {
 				headers: { Authorization: `Bearer ${Auth.getToken()}` },
 				data: { recipeId: recipe._id }
 			})
-			.then((resp) => setCollectionIds(resp.data.collection))
+			.then((resp) => {
+				setProfile({ ...profile, recipeCollection: resp.data.collection })
+			})
+			.catch((error) => console.log(error))
+	}
+
+	const saveToFavourites = () => {
+		axios
+			.put(
+				'/api/users/favourites',
+				{ recipeId: recipe._id },
+				{
+					headers: { Authorization: `Bearer ${Auth.getToken()}` }
+				}
+			)
+			.then((resp) =>
+				setProfile({ ...profile, favouriteRecipes: resp.data.favourites })
+			)
+			.catch((error) => console.log(error))
+	}
+
+	const removeFromFavourites = () => {
+		axios
+			.delete('/api/users/favourites', {
+				headers: { Authorization: `Bearer ${Auth.getToken()}` },
+				data: { recipeId: recipe._id }
+			})
+			.then((resp) =>
+				setProfile({ ...profile, favouriteRecipes: resp.data.favourites })
+			)
 			.catch((error) => console.log(error))
 	}
 
@@ -113,20 +146,38 @@ const RecipeCard = ({ recipe }) => {
 			
 			</CardContent> */}
 			<CardActions disableSpacing>
-				<IconButton aria-label="add to favorites">
-					<FavoriteIcon />
-				</IconButton>
+				{Auth.isAuthorized() && profile.favouriteRecipes ? (
+					!profile.favouriteRecipes.includes(recipe._id) ? (
+						<IconButton
+							aria-label="add to favorites"
+							onClick={saveToFavourites}
+						>
+							<FavoriteBorderIcon />
+						</IconButton>
+					) : (
+						<IconButton
+							aria-label="add to favorites"
+							onClick={removeFromFavourites}
+						>
+							<FavoriteIcon />
+						</IconButton>
+					)
+				) : (
+					<IconButton aria-label="add to favorites">
+						<FavoriteBorderIcon />
+					</IconButton>
+				)}
 				<IconButton aria-label="share">
 					<ShareIcon />
 				</IconButton>
-				{Auth.isAuthorized() ? (
-					!collectionIds.includes(recipe._id) ? (
+				{Auth.isAuthorized() && profile.recipeCollection ? (
+					!profile.recipeCollection.includes(recipe._id) ? (
 						<IconButton aria-label="save" onClick={saveToCollection}>
 							<BookmarkBorderIcon />
 						</IconButton>
 					) : (
 						<IconButton aria-label="save" onClick={removeFromCollection}>
-							<DeleteOutlineIcon />
+							<BookmarkIcon />
 						</IconButton>
 					)
 				) : (

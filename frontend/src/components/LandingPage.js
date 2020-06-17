@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react'
-import axios from 'axios'
-
+import React, { useContext } from 'react'
 import { makeStyles } from '@material-ui/core/styles'
 import Grid from '@material-ui/core/Grid'
 
 import RecipeCard from './RecipeCard'
+import { ModalContext } from './ModalContext'
 
 const useStyles = makeStyles((theme) => ({
 	root: {
@@ -19,18 +18,7 @@ const useStyles = makeStyles((theme) => ({
 
 const BrowseRecipes = () => {
 	const classes = useStyles()
-
-	const [recipes, setRecipes] = useState([])
-
-	useEffect(() => {
-		axios
-			.get('api/recipes/')
-			.then((resp) => {
-				// console.log(resp.data)
-				setRecipes(resp.data)
-			})
-			.catch((error) => console.log(error))
-	}, [])
+	const { recipes } = useContext(ModalContext)
 
 	return (
 		<div className={classes.root}>
